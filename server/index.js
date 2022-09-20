@@ -282,7 +282,7 @@ app.get('/search/movies/:query', (req, res) => {
   return axios(url)
     .then(({ data }) => data)
     .then((data) => res.status(200).send(data))
-    .catch();
+    .catch((err) => console.log(err, 'MOVE AUTH ISSUE'));
 });
 // get info on an individual movie : omdb
 app.get('/search/movie/:query', (req, res) => {

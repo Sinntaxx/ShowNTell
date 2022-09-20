@@ -18,6 +18,7 @@ const movieKey = process.env.MOVIE_DATABASE_KEY;
 const omdbKey = process.env.OMDB_KEY;
 const Notifs = require('twilio')(accountSid, authToken);
 const { ExpressPeerServer } = require('peer');
+const { game } = require('./Routes/index.js');
 const { GoogleStrategy } = require('./oauth/passport');
 
 const { Users, Posts, Shows, Replys, Movies } = require('./db/schema.js');
@@ -41,6 +42,7 @@ app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(cookieParser());
 app.use(cors());
+app.use('/game', game);
 
 passport.serializeUser((user, done) => {
   done(null, user);

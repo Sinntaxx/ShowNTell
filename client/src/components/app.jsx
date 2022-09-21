@@ -23,6 +23,7 @@ import SearchFeed from './SearchBar/searchFeed.jsx';
 import ShowFeed from './Subscriptions/showFeed.jsx';
 import MovieFeed from './Subscriptions/MovieFeed.jsx';
 import FriendList from './FriendList/friendList.jsx';
+import VideoGameList from './VideoGameList/VideoGameList.jsx';
 
 const App = () => {
   const [posts, setPosts] = useState();
@@ -126,6 +127,10 @@ const App = () => {
       console.log('heyya from redirect');
       window.location.assign('https://www.spacejam.com/1996/');
     }
+  };
+
+  const searchVideoGames = () => {
+    setView('videoGames');
   };
 
   const handleUserClick = (e) => {
@@ -236,6 +241,9 @@ const App = () => {
     }
     if (view === 'movieFeed') {
       return <MovieFeed movieId={movieId} subscribe={subscribeMovie} viewSwitcher={viewSwitcher} />;
+    }
+    if (view === 'videoGameFeed') {
+      return <VideoGameList viewSwitcher={viewSwitcher} />;
     }
   };
 

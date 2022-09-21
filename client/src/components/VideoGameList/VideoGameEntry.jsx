@@ -5,7 +5,7 @@ const VideoGameEntry = ({ dummyData }) => {
     <div>
       This is a video game lol:
       <h2>
-        { dummyData.ele }
+        { dummyData }
         {' '}
       </h2>
 

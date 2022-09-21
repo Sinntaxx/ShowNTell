@@ -129,9 +129,9 @@ const App = () => {
     }
   };
 
-  const searchVideoGames = () => {
-    setView('videoGames');
-  };
+  // const searchVideoGames = () => {
+  //   setView('videoGames');
+  // }
 
   const handleUserClick = (e) => {
     setUsersClicked(!userClicked);
@@ -242,7 +242,7 @@ const App = () => {
     if (view === 'movieFeed') {
       return <MovieFeed movieId={movieId} subscribe={subscribeMovie} viewSwitcher={viewSwitcher} />;
     }
-    if (view === 'videoGameFeed') {
+    if (view === 'videoGames') {
       return <VideoGameList viewSwitcher={viewSwitcher} />;
     }
   };

@@ -9,7 +9,7 @@ game.get('/test', (req, res) => {
 });
 
 // this endpoint will get games by a genre and take return the first 10.
-game.get('/genre', (req, res) => {
+game.post('/genre', (req, res) => {
   const config = {
     method: 'get',
     url: `http://steamspy.com/api.php?request=genre&genre=${req.body.genre}&page=1`,

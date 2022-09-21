@@ -24,6 +24,7 @@ import ShowFeed from './Subscriptions/showFeed.jsx';
 import MovieFeed from './Subscriptions/MovieFeed.jsx';
 import FriendList from './FriendList/friendList.jsx';
 import VideoGameList from './VideoGameList/VideoGameList.jsx';
+import Games from './GameRecommended/Games.jsx';
 
 const App = () => {
   const [posts, setPosts] = useState();
@@ -244,6 +245,10 @@ const App = () => {
     }
     if (view === 'videoGames') {
       return <VideoGameList viewSwitcher={viewSwitcher} />;
+    }
+    // Should show the games view
+    if (view === 'recGames') {
+      return <Games />;
     }
   };
 

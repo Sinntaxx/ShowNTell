@@ -1,4 +1,6 @@
 /* eslint-disable no-console */
+const https = require('https');
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const passport = require('passport');
@@ -751,7 +753,14 @@ app.get('/movieData/:id', (req, res) => {
     });
 });
 
-app.listen(8080, () => {
-  // eslint-disable-next-line no-console
-  console.log('http://localhost:8080');
+const options = {
+  key: fs.readFileSync('server/config/cert.key'),
+  cert: fs.readFileSync('server/config/cert.crt'),
+};
+https.createServer(options, app).listen(8080, () => {
+  console.log('https://localhost:8080');
 });
+// app.listen(8080, () => {
+//   // eslint-disable-next-line no-console
+//   console.log('http://localhost:8080');
+// });

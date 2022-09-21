@@ -1,6 +1,7 @@
 const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const express = require('express');
 const axios = require('axios');
+const { Users } = require('../db/schema.js');
 
 const game = express.Router();
 
@@ -21,7 +22,12 @@ game.post('/newUser', (req, res) => {
         chat_id: chatId,
         text: 'You are now subscribed to notifications from Game&Watch',
       })
+      .then()
+      .then(() => {
+        return Users.findOneAndUpdate({ id: userToken }, { chatId });
+      })
       .then((result) => {
+        console.log(result);
         res.sendStatus(200);
       })
       .catch((err) => {
@@ -29,13 +35,13 @@ game.post('/newUser', (req, res) => {
         res.sendStatus(400);
       });
   } else {
-    res.sendStatus(400);
+    res.sendStatus(200);
   }
 });
 
 // url to have user click: https://telegram.me/GameAndWatchBot?start=${userId}
 game.post('/notify', (req, res) => {
-  const { name, updateTitle, link, chat_id, number } = req.body;
+  const { name, updateTitle, link, chat_id } = req.body;
   const text = `**New Update**\n${name}\n${updateTitle}\n${link}`;
   axios
     .post(`https://api.telegram.org/bot${botToken}/sendMessage`, {

@@ -60,6 +60,26 @@ const replySchema = mongoose.Schema({
 
 const Replys = mongoose.model('Replys', replySchema);
 
+const gameSchema = mongoose.Schema({
+  description: String,
+  short_desc: String,
+  about: String,
+  header_image: String,
+  requirements: Object,
+  developers: [String],
+  price: Object,
+  package: Object,
+  platforms: Object,
+  categories: Array,
+  genres: Array,
+  screenshots: Array,
+  movies: Array,
+  achievements: Object,
+  release_date: Object,
+  user_reviews: Array,
+});
+
+const Games = mongoose.model('Game', gameSchema);
 // ?? //
 // ** //
 // !! //
@@ -90,4 +110,5 @@ module.exports = {
   Posts,
   Replys,
   Movies,
+  Games,
 };

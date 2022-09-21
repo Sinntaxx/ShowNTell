@@ -11,6 +11,7 @@ game.get('/test', (req, res) => {
 
 // url to notify webpage that a user has started a chat with the bot: https://${siteUrl}/game/newUser
 game.post('/newUser', (req, res) => {
+  console.log('arrived');
   console.log(req.body);
   res.sendStatus(200);
 });

@@ -12,16 +12,22 @@ game.get('/test', (req, res) => {
 game.get('/genre', (req, res) => {
   const config = {
     method: 'get',
-    url: 'http://steamspy.com/api.php?request=genre&genre=Action&page=1',
+    url: `http://steamspy.com/api.php?request=genre&genre=${req.body.genre}&page=1`,
     headers: { },
   };
 
   axios(config)
     .then((response) => {
-      res.status(200).send(JSON.stringify(response.data));
+      const top10Games = [];
+      const keys = Object.keys(response.data);
+      for (let i = 0; i < 10; i += 1) {
+        top10Games.push(response.data[keys[i]]);
+      }
+      res.status(200).send(JSON.stringify(top10Games));
     })
-    .catch((error) => {
-      console.log(error);
+    .catch((err) => {
+      console.log(err);
+      res.status(404).send('Error in the request to the steam api');
     });
 });
 

@@ -12,6 +12,7 @@ const userSchema = mongoose.Schema({
   movieSubscriptions: Array,
   following: Array,
   followers: Array,
+  chatId: Number,
 });
 
 const Users = mongoose.model('Users', userSchema);

@@ -23,6 +23,7 @@ import SearchFeed from './SearchBar/searchFeed.jsx';
 import ShowFeed from './Subscriptions/showFeed.jsx';
 import MovieFeed from './Subscriptions/MovieFeed.jsx';
 import FriendList from './FriendList/friendList.jsx';
+import Games from './GameRecommended/Games.jsx';
 
 const App = () => {
   const [posts, setPosts] = useState();
@@ -236,6 +237,11 @@ const App = () => {
     }
     if (view === 'movieFeed') {
       return <MovieFeed movieId={movieId} subscribe={subscribeMovie} viewSwitcher={viewSwitcher} />;
+    }
+
+    // Should show the games view
+    if (view === 'recGames') {
+      return <Games />;
     }
   };
 

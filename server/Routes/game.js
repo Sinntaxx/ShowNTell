@@ -46,6 +46,33 @@ game.get('/byname/:name', (req, res) => {
     });
 });
 
+// path to retrieve an individual games achievements
+game.get('/achievements/:gameId', (req, res) => {
+  const { gameId } = req.params;
+
+  // axios request
+  return axios.get(`https://api.achievementstats.com/games/${gameId}/achievements/?key=${process.env.STEAM_ACHIEVE_KEY}`)
+    .then(({ data }) => {
+      const achievs = data.map((ach) => {
+        return {
+          name: ach.name,
+          desc: ach.description,
+          imgLocked: `https://www.achievementstats.com/${ach.iconLocked}`,
+          imgUnlocked: `https://www.achievementstats.com/${ach.iconUnlocked}`,
+        };
+      });
+      console.log('formatted achievements\n', achievs);
+      res.sendStatus(200);
+    })
+    .catch((err) => {
+      console.error('error getting game achievements\n', err);
+      res.sendStatus(500);
+    });
+});
+
+// path to get all achievements for a individual user;
+//  game.get('/user/achievements/:userId')
+
 // this endpoint will get games by a genre and take return the first 10.
 game.post('/genre', (req, res) => {
   const config = {

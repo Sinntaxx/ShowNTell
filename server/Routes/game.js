@@ -58,4 +58,9 @@ game.post('/notify', (req, res) => {
     });
 });
 
+// Endpoint for finding out if any games have been updated
+game.get('/updates', (req, res) => {
+
+});
+
 module.exports = game;

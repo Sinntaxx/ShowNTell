@@ -39,7 +39,7 @@ game.get('/:name', (req, res) => {
 game.post('/genre', (req, res) => {
   const config = {
     method: 'get',
-    url: `http://steamspy.com/api.php?request=genre&genre=${req.body.genre}&page=1`,
+    url: `http://steamspy.com/api.php?request=genre&genre=${req.body.genre}&count=10`,
     headers: { },
   };
 

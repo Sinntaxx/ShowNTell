@@ -13,6 +13,7 @@ const userSchema = mongoose.Schema({
   following: Array,
   followers: Array,
   chatId: Number,
+  achievements: Array,
 });
 
 const Users = mongoose.model('Users', userSchema);
@@ -61,6 +62,10 @@ const replySchema = mongoose.Schema({
 const Replys = mongoose.model('Replys', replySchema);
 
 const gameSchema = mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+  },
   description: String,
   short_desc: String,
   about: String,
@@ -77,9 +82,17 @@ const gameSchema = mongoose.Schema({
   achievements: Object,
   release_date: Object,
   user_reviews: Array,
+  most_recent_update: String,
 });
 
 const Games = mongoose.model('Game', gameSchema);
+
+const notificationSchema = mongoose.Schema({
+  gameId: Number,
+  userId: Number,
+});
+
+const Notifications = mongoose.model('Notification', notificationSchema);
 // ?? //
 // ** //
 // !! //
@@ -111,4 +124,5 @@ module.exports = {
   Replys,
   Movies,
   Games,
+  Notifications,
 };

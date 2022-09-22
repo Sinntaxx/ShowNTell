@@ -10,6 +10,7 @@ const userSchema = mongoose.Schema({
   follows: Array,
   subscriptions: Array,
   movieSubscriptions: Array,
+  gameSubscriptions: Array,
   following: Array,
   followers: Array,
   chatId: Number,

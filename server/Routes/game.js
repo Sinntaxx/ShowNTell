@@ -1,14 +1,15 @@
 const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const express = require('express');
 const axios = require('axios');
-const { Users } = require('../db/schema.js');
+const { Users, Games, Notifications } = require('../db/schema.js');
 
 const game = express.Router();
 
 game.get('/byname/:name', (req, res) => {
   console.log('name from parameters', req.params);
   const { name } = req.params;
-  axios.get(`https://steamcommunity.com/actions/SearchApps/${name}`)
+  axios
+    .get(`https://steamcommunity.com/actions/SearchApps/${name}`)
     .then(({ data }) => {
       if (!data.length) {
         res.sendStatus(404);
@@ -78,7 +79,7 @@ game.post('/genre', (req, res) => {
   const config = {
     method: 'get',
     url: `http://steamspy.com/api.php?request=genre&genre=${req.body.genre}&page=1`,
-    headers: { },
+    headers: {},
   };
 
   axios(config)
@@ -125,21 +126,74 @@ game.post('/newUser', (req, res) => {
 });
 
 // url to have user click: https://telegram.me/GameAndWatchBot?start=${userId}
-game.post('/notify', (req, res) => {
-  const { name, updateTitle, link, chat_id } = req.body;
-  const text = `**New Update**\n${name}\n${updateTitle}\n${link}`;
-  axios
-    .post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      chat_id,
-      text,
+
+// Url for getting news about a game by its id:  http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${game.id}&count=5&format=json
+// Endpoint for finding out if any games have been updated
+game.get('/updates', (req, res) => {
+  let allPatchNotes;
+  let notifications;
+  Notifications.find({})
+    .then((notifs) => {
+      console.log('notifs: ', notifs);
+      notifications = notifs;
+      // Might be able to use just promise.all without promise.resolve
+      return Promise.resolve(
+        Promise.all(
+          notifs.map((notif) => axios.post(
+            `http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${notif.gameId}&count=10&format=json`,
+          )),
+        ),
+      );
     })
-    .then((result) => {
-      console.log(result);
-      res.sendStatus(200);
+    .then((allNews) => {
+      console.log('allNews: ', allNews);
+      allPatchNotes = allNews.map((gameNews) => {
+        gameNews.appNews.newsItems = gameNews.appNews.newsItems.filter(
+          (news) => news.tags && news.tags.includes('patchnotes'),
+        );
+        return gameNews;
+      });
+      return Promise.resolve(
+        Promise.all(
+          allPatchNotes.map((patchNotes) => Games.findOne({ id: patchNotes.appNews.appid })),
+        ),
+      );
+    })
+    .then((games) => {
+      console.log('games: ', games);
+      games.forEach((game, i) => {
+        if (
+          game.most_recent_update.title
+          !== allPatchNotes[i].appNews.newsItems[0].title
+        ) {
+          game.most_recent_update = allPatchNotes[i].appNews.newsItems[0].title;
+          Games.findOneAndUpdate(game, game);
+          notifications.forEach((notification) => Users.findOne({ id: notification.userId })
+            .then((user) => {
+              console.log('user: ', user);
+              return Promise.resolve(Promise.all(notifications.map((noti) => {
+                if (noti.gameId === game.id && noti.userId === user.id) {
+                  const text = `**New Update**\n${game.name}\n${game.most_recent_update.title}\n${game.url}`;
+                  return axios.post(
+                    `https://api.telegram.org/bot${botToken}/sendMessage`,
+                    {
+                      chat_id: user.chatId,
+                      text,
+                    },
+                  );
+                }
+                return null;
+              }).filter((a) => a !== null)));
+            })
+            .then(() => {
+              res.sendStatus(200);
+            }));
+        }
+      });
     })
     .catch((err) => {
       console.error(err);
-      res.sendStatus(400);
+      res.sendStatus(500);
     });
 });
 

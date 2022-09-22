@@ -15,6 +15,7 @@ const userSchema = mongoose.Schema({
   followers: Array,
   chatId: Number,
   achievements: Array,
+  user_reviews: Array,
 });
 
 const Users = mongoose.model('Users', userSchema);
@@ -39,7 +40,7 @@ const Movies = mongoose.model('Movies', movieSchema);
 
 const postSchema = mongoose.Schema({
   user: String,
-  show: String,
+  topic_id: String,
   title: String,
   content: {
     text: String,
@@ -48,6 +49,7 @@ const postSchema = mongoose.Schema({
   comment: Array,
   createdAt: Date,
   likes: Array,
+  type: String,
 });
 
 const Posts = mongoose.model('Posts', postSchema);

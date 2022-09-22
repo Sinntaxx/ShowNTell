@@ -10,9 +10,11 @@ const userSchema = mongoose.Schema({
   follows: Array,
   subscriptions: Array,
   movieSubscriptions: Array,
+  gameSubscriptions: Array,
   following: Array,
   followers: Array,
   chatId: Number,
+  achievements: Array,
 });
 
 const Users = mongoose.model('Users', userSchema);
@@ -26,14 +28,14 @@ const showSchema = mongoose.Schema({
 
 const Shows = mongoose.model('Shows', showSchema);
 
-const showMovie = mongoose.Schema({
+const movieSchema = mongoose.Schema({
   title: String,
   id: Number,
   posts: Array,
   subscriberCount: Number,
 });
 
-const Movies = mongoose.model('Movies', showMovie);
+const Movies = mongoose.model('Movies', movieSchema);
 
 const postSchema = mongoose.Schema({
   user: String,
@@ -61,6 +63,10 @@ const replySchema = mongoose.Schema({
 const Replys = mongoose.model('Replys', replySchema);
 
 const gameSchema = mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+  },
   description: String,
   short_desc: String,
   about: String,
@@ -77,9 +83,17 @@ const gameSchema = mongoose.Schema({
   achievements: Object,
   release_date: Object,
   user_reviews: Array,
+  most_recent_update: String,
 });
 
 const Games = mongoose.model('Game', gameSchema);
+
+const notificationSchema = mongoose.Schema({
+  gameId: Number,
+  userId: Number,
+});
+
+const Notifications = mongoose.model('Notification', notificationSchema);
 // ?? //
 // ** //
 // !! //
@@ -111,4 +125,5 @@ module.exports = {
   Replys,
   Movies,
   Games,
+  Notifications,
 };

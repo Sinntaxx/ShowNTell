@@ -28,14 +28,14 @@ const showSchema = mongoose.Schema({
 
 const Shows = mongoose.model('Shows', showSchema);
 
-const showMovie = mongoose.Schema({
+const movieSchema = mongoose.Schema({
   title: String,
   id: Number,
   posts: Array,
   subscriberCount: Number,
 });
 
-const Movies = mongoose.model('Movies', showMovie);
+const Movies = mongoose.model('Movies', movieSchema);
 
 const postSchema = mongoose.Schema({
   user: String,

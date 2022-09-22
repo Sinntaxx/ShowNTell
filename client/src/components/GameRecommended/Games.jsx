@@ -28,9 +28,24 @@ const Games = () => {
       });
   }, []);
 
+  const test = () => {
+    const config = {
+      method: 'get',
+      url: 'http://localhost:8080/game/subscribe',
+    };
+    axios(config)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div className="container">
       <h1 className="text">Recommended Games!</h1>
+      <button onClick={() => test()}>TEST</button>
       {
         games.map((game) => (
           <div className="card">

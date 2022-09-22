@@ -159,5 +159,16 @@ game.get('/updates', (req, res) => {
       res.sendStatus(500);
     });
 });
-
+// testing
+game.get('/subscribe', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId }).then((userInfo) => {
+    Promise.all(userInfo.gameSubscriptions.map((game) => Games.findOne({ id: game.id })))
+      .then((results) => {
+        const g = [];
+        results.forEach((result) => result.genres.forEach((genre) => g.push(genre)));
+        res.status(200).send(JSON.stringify(g));
+      })
+      .catch((err) => res.status(404).send('error on the server'));
+  });
+});
 module.exports = game;

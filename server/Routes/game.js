@@ -5,6 +5,63 @@ const { Users, Games, Notifications } = require('../db/schema.js');
 
 const game = express.Router();
 
+// save game in database
+const saveGame = async (game) => {
+  // game is formatted from steam store api for db
+  const dbGame = {
+    id: game.steam_appid,
+    description: game.detailed_description,
+    short_desc: game.short_description,
+    about: game.about_the_game,
+    header_image: game.header_image,
+    requirements: game.pc_requirements,
+    developers: game.developers,
+    price: game.price_overview,
+    package: game.package_groups.subs,
+    platforms: game.platforms,
+    categories: game.categories,
+    genres: game.genres,
+    screenshots: game.screenshots,
+    movies: game.movies,
+    achievements: [],
+    release_date: game.release_date,
+    user_reviews: [],
+    most_recent_update: '',
+  };
+  try {
+    const { data } = await axios.get(`https://api.achievementstats.com/games/${dbGame.id}/achievements/?key=${process.env.STEAM_ACHIEVE_KEY}`);
+
+    const achievs = data.map((ach) => {
+      return {
+        name: ach.name,
+        desc: ach.description,
+        imgLocked: `https://www.achievementstats.com/${ach.iconLocked}`,
+        imgUnlocked: `https://www.achievementstats.com/${ach.iconUnlocked}`,
+      };
+    });
+    dbGame.achievements = achievs;
+    await Games.create(dbGame);
+    return 'database Game created!';
+  } catch (err) {
+    console.error('error getting achievements\n', err);
+  }
+};
+
+// testing saveGame with request, remove later
+game.post('/newgame', (req, res) => {
+  const newGame = req.body;
+  return saveGame(newGame)
+    .then((data) => {
+      console.log('data returned\n', data);
+      res.sendStatus(201);
+    })
+    .catch((err) => {
+      console.error('error on request\n', err);
+      res.sendStatus(500);
+    });
+});
+
+// find games by name
 game.get('/byname/:name', (req, res) => {
   console.log('name from parameters', req.params);
   const { name } = req.params;
@@ -43,30 +100,6 @@ game.get('/byname/:name', (req, res) => {
     })
     .catch((err) => {
       console.error('error requesting app id by name\n', err);
-      res.sendStatus(500);
-    });
-});
-
-// path to retrieve an individual games achievements
-game.get('/achievements/:gameId', (req, res) => {
-  const { gameId } = req.params;
-
-  // axios request
-  return axios.get(`https://api.achievementstats.com/games/${gameId}/achievements/?key=${process.env.STEAM_ACHIEVE_KEY}`)
-    .then(({ data }) => {
-      const achievs = data.map((ach) => {
-        return {
-          name: ach.name,
-          desc: ach.description,
-          imgLocked: `https://www.achievementstats.com/${ach.iconLocked}`,
-          imgUnlocked: `https://www.achievementstats.com/${ach.iconUnlocked}`,
-        };
-      });
-      console.log('formatted achievements\n', achievs);
-      res.sendStatus(200);
-    })
-    .catch((err) => {
-      console.error('error getting game achievements\n', err);
       res.sendStatus(500);
     });
 });

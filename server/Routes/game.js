@@ -5,7 +5,7 @@ const { Users } = require('../db/schema.js');
 
 const game = express.Router();
 
-game.get('/:name', (req, res) => {
+game.get('/byname/:name', (req, res) => {
   console.log('name from parameters', req.params);
   const { name } = req.params;
   axios.get(`https://steamcommunity.com/actions/SearchApps/${name}`)
@@ -13,20 +13,31 @@ game.get('/:name', (req, res) => {
       if (!data.length) {
         res.sendStatus(404);
       }
-      if (data.length > 1) {
-        // return data.map((game) => {
-        //   return axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
-        // })
-      }
-      const gameId = data[0].appid;
-      // console.log('gameobj from steam\n', data, '\n\ngameid returned from api', gameId);
-      axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
-        .then(({ data }) => {
-          const game = data[gameId].data;
-          console.log('data returned from store api', game);
+
+      const gameIds = data.map((game) => {
+        const gameId = game.appid;
+        return axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
+          .then(({ data }) => {
+            const gameObj = data[gameId].data;
+            return gameObj;
+          })
+          .catch((err) => {
+            console.error('error on request\n', err);
+          });
+      });
+      return gameIds;
+    })
+    .then((promiseArr) => {
+      // console.log('array of promises?\n\n', promiseArr);
+      const theTruth = Promise.resolve(Promise.all(promiseArr));
+      return theTruth
+        .then((data) => {
+          console.log('theTruths data\n', data);
+          res.sendStatus(200);
         })
         .catch((err) => {
-          console.error('error getting data by id\n', err);
+          console.error('error on request\n', err);
+          res.sendStatus(500);
         });
     })
     .catch((err) => {

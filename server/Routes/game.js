@@ -5,11 +5,58 @@ const { Users } = require('../db/schema.js');
 
 const game = express.Router();
 
-// example
-game.get('/test', (req, res) => {
-  res.sendStatus(200);
+game.get('/:name', (req, res) => {
+  console.log('name from parameters', req.params);
+  const { name } = req.params;
+  axios.get(`https://steamcommunity.com/actions/SearchApps/${name}`)
+    .then(({ data }) => {
+      if (!data.length) {
+        res.sendStatus(404);
+      }
+      if (data.length > 1) {
+        // return data.map((game) => {
+        //   return axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
+        // })
+      }
+      const gameId = data[0].appid;
+      // console.log('gameobj from steam\n', data, '\n\ngameid returned from api', gameId);
+      axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
+        .then(({ data }) => {
+          const game = data[gameId].data;
+          console.log('data returned from store api', game);
+        })
+        .catch((err) => {
+          console.error('error getting data by id\n', err);
+        });
+    })
+    .catch((err) => {
+      console.error('error requesting app id by name\n', err);
+      res.sendStatus(500);
+    });
 });
 
+// this endpoint will get games by a genre and take return the first 10.
+game.post('/genre', (req, res) => {
+  const config = {
+    method: 'get',
+    url: `http://steamspy.com/api.php?request=genre&genre=${req.body.genre}&page=1`,
+    headers: { },
+  };
+
+  axios(config)
+    .then((response) => {
+      const top10Games = [];
+      const keys = Object.keys(response.data);
+      for (let i = 0; i < 10; i += 1) {
+        top10Games.push(response.data[keys[i]]);
+      }
+      res.status(200).send(JSON.stringify(top10Games));
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(404).send('Error in the request to the steam api');
+    });
+});
 // url to notify webpage that a user has started a chat with the bot: https://${siteUrl}/game/newUser
 game.post('/newUser', (req, res) => {
   const { message } = req.body;

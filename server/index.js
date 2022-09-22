@@ -566,9 +566,9 @@ app.delete('/notifs/:index', (req, res) => {
   });
 });
 
-// app.get('/postShow/:id', (req, res) => {
-//   Shows.findOne({ id: req.params.id }).then((data) => res.json(data));
-// });
+app.get('/postShow/:id', (req, res) => {
+  Shows.findOne({ id: req.params.id }).then((data) => res.json(data));
+});
 
 app.get('/postUser/:id', (req, res) => {
   Users.findOne({ _id: req.params.id }).then((data) => res.json(data));

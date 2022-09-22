@@ -1,6 +1,7 @@
 const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const express = require('express');
 const axios = require('axios');
+const { json } = require('body-parser');
 const { Users, Games, Notifications } = require('../db/schema.js');
 
 const game = express.Router();
@@ -198,14 +199,19 @@ game.get('/updates', (req, res) => {
 });
 // testing
 game.get('/subscribe', (req, res) => {
-  Users.findOne({ id: req.cookies.ShowNTellId }).then((userInfo) => {
-    Promise.all(userInfo.gameSubscriptions.map((game) => Games.findOne({ id: game.id })))
-      .then((results) => {
-        const g = [];
-        results.forEach((result) => result.genres.forEach((genre) => g.push(genre)));
-        res.status(200).send(JSON.stringify(g));
-      })
-      .catch((err) => res.status(404).send('error on the server'));
-  });
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then((userInfo) => {
+      Promise.all(userInfo.gameSubscriptions.map((game) => Games.findOne({ id: game })))
+        .then((results) => {
+          const g = [];
+          results.forEach((result) => result.genres.forEach((genre) => g.push(genre.description)));
+          res.status(200).send(g[(Math.floor(Math.random() * ((g.length - 1) - 0 + 1)) + 0)]);
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(404).send('error on the server');
+        });
+    });
 });
+
 module.exports = game;

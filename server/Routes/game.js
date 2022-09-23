@@ -30,6 +30,12 @@ const saveGame = async (game) => {
     most_recent_update: {},
   };
   try {
+    const check = await Games.find({ id: dbGame.id });
+
+    if (check.length) {
+      // console.error('already found in database!');
+      return check;
+    }
     const { data } = await axios.get(`https://api.achievementstats.com/games/${dbGame.id}/achievements/?key=${process.env.STEAM_ACHIEVE_KEY}`);
 
     const achievs = data.map((ach) => {
@@ -42,7 +48,7 @@ const saveGame = async (game) => {
     });
     dbGame.achievements = achievs;
     await Games.create(dbGame);
-    return 'database Game created!';
+    return dbGame;
   } catch (err) {
     console.error('error getting achievements\n', err);
   }
@@ -53,7 +59,7 @@ game.post('/newgame', (req, res) => {
   const newGame = req.body;
   return saveGame(newGame)
     .then((data) => {
-      console.log('data returned\n', data);
+      // console.log('data returned\n', data);
       res.sendStatus(201);
     })
     .catch((err) => {
@@ -62,7 +68,7 @@ game.post('/newgame', (req, res) => {
     });
 });
 
-// find games by name
+// find games by name and save to db
 game.get('/byname/:name', (req, res) => {
   console.log('name from parameters', req.params);
   const { name } = req.params;
@@ -78,7 +84,12 @@ game.get('/byname/:name', (req, res) => {
         return axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
           .then(({ data }) => {
             const gameObj = data[gameId].data;
-            return gameObj;
+            // console.log('game object\n', gameObj)
+            return saveGame(gameObj);
+          })
+          .then((data) => {
+            // console.log('data returned from saveGame\n', data);
+            return data;
           })
           .catch((err) => {
             console.error('error on request\n', err);
@@ -91,7 +102,7 @@ game.get('/byname/:name', (req, res) => {
       const theTruth = Promise.resolve(Promise.all(promiseArr));
       return theTruth
         .then((data) => {
-          console.log('theTruths data\n', data);
+          // console.log('theTruths data\n', data);
           res.sendStatus(200);
         })
         .catch((err) => {

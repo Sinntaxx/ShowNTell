@@ -462,7 +462,7 @@ app.post('/posts', (req, res) => {
       content: { text, pic },
       user: poster,
       name,
-      show,
+      topic_id: show,
       comments: {},
       createdAt: new Date(),
       liked: false,
@@ -567,7 +567,12 @@ app.delete('/notifs/:index', (req, res) => {
 });
 
 app.get('/postShow/:id', (req, res) => {
-  Shows.findOne({ id: req.params.id }).then((data) => res.json(data));
+  Shows.findOne({ id: req.params.id })
+    .then((data) => res.json(data))
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(400);
+    });
 });
 
 app.get('/postUser/:id', (req, res) => {
@@ -753,14 +758,14 @@ app.get('/movieData/:id', (req, res) => {
     });
 });
 
-const options = {
-  key: fs.readFileSync('server/config/cert.key'),
-  cert: fs.readFileSync('server/config/cert.crt'),
-};
-https.createServer(options, app).listen(8080, () => {
-  console.log('https://localhost:8080');
-});
-// app.listen(8080, () => {
-//   // eslint-disable-next-line no-console
-//   console.log('http://localhost:8080');
+// const options = {
+//   key: fs.readFileSync('server/config/cert.key'),
+//   cert: fs.readFileSync('server/config/cert.crt'),
+// };
+// https.createServer(options, app).listen(8080, () => {
+//   console.log('https://localhost:8080');
 // });
+app.listen(8080, () => {
+  // eslint-disable-next-line no-console
+  console.log('http://localhost:8080');
+});

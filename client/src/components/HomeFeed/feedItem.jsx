@@ -40,8 +40,10 @@ const FeedItem = ({ post, user = {}, setPosts, setUser }) => {
   const [follow, setFollow] = useState(isFollowing());
   const getShow = () => {
     if (!show) {
-      axios(`/postShow/${currentPost.topic_id}`).then(({ data }) => {
+      axios(`/postShow/${currentPost.show}`).then(({ data }) => {
         setShow(data.name);
+      }).catch((err) => {
+        console.error(err);
       });
     }
   };

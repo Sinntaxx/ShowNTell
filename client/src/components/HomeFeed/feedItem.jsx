@@ -42,6 +42,8 @@ const FeedItem = ({ post, user = {}, setPosts, setUser }) => {
     if (!show) {
       axios(`/postShow/${currentPost.show}`).then(({ data }) => {
         setShow(data.name);
+      }).catch((err) => {
+        console.error(err);
       });
     }
   };

@@ -214,6 +214,9 @@ const App = () => {
     if (view === 'DMs') {
       return <DMs user={user} setUser={setUser} />;
     }
+    if (view === 'gameNotifs') {
+      return <meta httpEquiv="Refresh" content={`0; url='https://telegram.me/GameAndWatchBot?start=${user.id}'`} />;
+    }
     if (view === 'notifs') {
       return <Notifs user={user} setUser={setUser} />;
     }

@@ -41,9 +41,6 @@ const Notifs = ({ user, setUser }) => {
           <div id="change-number-msg"> want to change phone number currently receiving notifications? </div>
           <button
             id="change-number-button"
-            onClick={() => axios.post('/number', { number: null })
-              .then(() => axios.get('/user'))
-              .then((result) => setUser(result.data))}
           >
             change number
           </button>

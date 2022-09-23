@@ -1,0 +1,34 @@
+.video-game-search-label {
+  margin: 1rem;
+  margin-top: 0.5rem;
+  color: white;
+  font-family: 'Work Sans', sans-serif;
+}
+#game-name {
+  margin: 1rem;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.video-game-submit-button {
+  font-family: 'Work Sans', sans-serif;
+  border: 0;
+  display: inline-block;
+  margin-top: 2%;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 12px;
+  background-color: white;
+  padding: 8px 12px;
+  color: #6d6ca6;
+}
+.video-game-submit-button:active {
+  background: #1aaa67;
+  -webkit-box-shadow: inset 0px 0px 5px #1232e9;
+     -moz-box-shadow: inset 0px 0px 5px #db1919;
+          box-shadow: inset 0px 0px 5px #c1c1c1;
+   outline: none;
+}
+.video-game-submit-button:hover {
+  background-color:#8419db;
+}

@@ -462,7 +462,7 @@ app.post('/posts', (req, res) => {
       content: { text, pic },
       user: poster,
       name,
-      show,
+      topic_id: show,
       comments: {},
       createdAt: new Date(),
       liked: false,

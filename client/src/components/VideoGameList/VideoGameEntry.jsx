@@ -1,15 +1,10 @@
 import React from 'react';
 
-const VideoGameEntry = ({ dummyData }) => {
+const VideoGameEntry = ({ ele }) => {
   return (
-    <div>
-      This is a video game lol:
-      <h2>
-        { console.log(dummyData) }
-        {' '}
-      </h2>
-
-    </div>
+    <h2>
+      {ele}
+    </h2>
   );
 };
 

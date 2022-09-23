@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './games.css';
+import { get } from 'jquery';
 
 const Games = () => {
   const [games, setGames] = useState(() => [{ name: 'test' }]);
 
-  useEffect(() => {
+  const getGames = (genre) => {
     const data = JSON.stringify({
-      genre: 'Action',
+      genre,
     });
 
     const config = {
@@ -22,6 +23,21 @@ const Games = () => {
     axios(config)
       .then((response) => {
         setGames(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    const config = {
+      method: 'get',
+      url: 'http://localhost:8080/game/subscribe',
+    };
+    axios(config)
+      .then((response) => {
+        console.log(response);
+        getGames(response.data);
       })
       .catch((error) => {
         console.log(error);

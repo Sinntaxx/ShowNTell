@@ -123,7 +123,20 @@ game.post('/genre', (req, res) => {
       for (let i = 0; i < 10; i += 1) {
         top10Games.push(response.data[keys[i]]);
       }
-      res.status(200).send(JSON.stringify(top10Games));
+
+      Promise.all(top10Games.map((game) => {
+        const getGameInfo = {
+          method: 'get',
+          url: `http://store.steampowered.com/api/appdetails?appids=${game.appid}`,
+          headers: {},
+        };
+        return axios(getGameInfo);
+      }))
+        .then((gamesInfo) => res.status(201).send(JSON.stringify(gamesInfo.map((gameInfo, i) => gameInfo.data[top10Games[i].appid].data))))
+        .catch((err) => {
+          console.log(err);
+          res.status(404).send('Error in the request to the steam api');
+        });
     })
     .catch((err) => {
       console.log(err);

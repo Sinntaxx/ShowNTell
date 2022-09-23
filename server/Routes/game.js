@@ -144,7 +144,7 @@ game.post('/newUser', (req, res) => {
         text: 'You are now subscribed to notifications from Game&Watch',
       })
       .then(() => {
-        return Users.findOneAndUpdate({ id: userToken }, { chatId });
+        return Users.findOneAndUpdate({ id: userToken }, { chatId, notifs: true });
       })
       .then((result) => {
         console.log(result);

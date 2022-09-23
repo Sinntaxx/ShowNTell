@@ -41,10 +41,12 @@ const Nav = ({ user, onClick, logout, search, setSearch, onSearch, onSearchTwo }
         <FaBell />
         {' '}
       </li>
-      <li onClick={() => onClick('gameNotifs')} className="views" title="game update notifications">
-        <FaBell />
-        {' '}
-      </li>
+      {!user.notifs ? (
+        <li onClick={() => onClick('gameNotifs')} className="views" title="game update notifications">
+          <FaBell />
+          {' '}
+        </li>
+      ) : null}
       <li onClick={() => onClick('DMs')} className="views" title="messages">
         <FaEnvelope />
         {' '}

@@ -33,5 +33,6 @@ module.exports = {
     camelcase: 0,
     'no-param-reassign': 0,
     'max-len': 0,
+    'prefer-destructuring': 0,
   },
 };

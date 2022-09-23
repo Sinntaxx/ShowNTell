@@ -42,7 +42,7 @@ const saveGame = async (game) => {
     });
     dbGame.achievements = achievs;
     await Games.create(dbGame);
-    return 'database Game created!';
+    return dbGame;
   } catch (err) {
     console.error('error getting achievements\n', err);
   }
@@ -78,7 +78,12 @@ game.get('/byname/:name', (req, res) => {
         return axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
           .then(({ data }) => {
             const gameObj = data[gameId].data;
-            return gameObj;
+            // console.log('game object\n', gameObj)
+            return saveGame(gameObj);
+          })
+          .then((data) => {
+            // console.log('data returned from saveGame\n', data);
+            return data;
           })
           .catch((err) => {
             console.error('error on request\n', err);

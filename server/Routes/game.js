@@ -59,6 +59,7 @@ game.post('/genre', (req, res) => {
       res.status(404).send('Error in the request to the steam api');
     });
 });
+
 // url to notify webpage that a user has started a chat with the bot: https://${siteUrl}/game/newUser
 game.post('/newUser', (req, res) => {
   const { message } = req.body;
@@ -71,7 +72,6 @@ game.post('/newUser', (req, res) => {
         chat_id: chatId,
         text: 'You are now subscribed to notifications from Game&Watch',
       })
-      .then()
       .then(() => {
         return Users.findOneAndUpdate({ id: userToken }, { chatId });
       })
@@ -92,72 +92,71 @@ game.post('/newUser', (req, res) => {
 
 // Url for getting news about a game by its id:  http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${game.id}&count=5&format=json
 // Endpoint for finding out if any games have been updated
-game.get('/updates', (req, res) => {
+game.post('/updates', (req, res) => {
   let allPatchNotes;
-  let notifications;
-  Notifications.find({})
-    .then((notifs) => {
-      console.log('notifs: ', notifs);
-      notifications = notifs;
-      // Might be able to use just promise.all without promise.resolve
-      return Promise.resolve(
-        Promise.all(
-          notifs.map((notif) => axios.post(
-            `http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${notif.gameId}&count=10&format=json`,
-          )),
-        ),
-      );
-    })
-    .then((allNews) => {
-      console.log('allNews: ', allNews);
-      allPatchNotes = allNews.map((gameNews) => {
-        gameNews.appNews.newsItems = gameNews.appNews.newsItems.filter(
-          (news) => news.tags && news.tags.includes('patchnotes'),
-        );
-        return gameNews;
-      });
-      return Promise.resolve(
-        Promise.all(
-          allPatchNotes.map((patchNotes) => Games.findOne({ id: patchNotes.appNews.appid })),
-        ),
-      );
-    })
-    .then((games) => {
-      console.log('games: ', games);
-      games.forEach((game, i) => {
-        if (
-          game.most_recent_update.title
-          !== allPatchNotes[i].appNews.newsItems[0].title
-        ) {
-          game.most_recent_update = allPatchNotes[i].appNews.newsItems[0].title;
-          Games.findOneAndUpdate(game, game);
-          notifications.forEach((notification) => Users.findOne({ id: notification.userId })
-            .then((user) => {
-              console.log('user: ', user);
-              return Promise.resolve(Promise.all(notifications.map((noti) => {
-                if (noti.gameId === game.id && noti.userId === user.id) {
-                  const text = `**New Update**\n${game.name}\n${game.most_recent_update.title}\n${game.url}`;
-                  return axios.post(
-                    `https://api.telegram.org/bot${botToken}/sendMessage`,
-                    {
-                      chat_id: user.chatId,
-                      text,
-                    },
-                  );
-                }
-                return null;
-              }).filter((a) => a !== null)));
+  Users.find({ notifs: true }).then((users) => {
+    Games.find({})
+      .then((games) => {
+        // Might be able to use just promise.all without promise.resolve
+        return Promise.all(
+          games.map((game) => axios
+            .get(
+              `http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${game.id}&count=100&format=json`,
+            )
+            .then((results) => {
+              return results;
             })
-            .then(() => {
-              res.sendStatus(200);
-            }));
-        }
+            .catch((err) => {
+              console.error(err);
+            })),
+        );
+      })
+      .then((allNews) => {
+        allPatchNotes = allNews.map((gameNews) => {
+          gameNews.data.appnews.newsitems = gameNews.data.appnews.newsitems.filter(
+            (news) => news.tags && news.tags.includes('patchnotes'),
+          );
+          return gameNews;
+        });
+        return Promise.all(
+          allPatchNotes.map((patchNotes) => Games.findOne({ id: patchNotes.data.appnews.appid })),
+        );
+      })
+      .then((games) => {
+        games.forEach((game, i) => {
+          if (
+            allPatchNotes[i].data.appnews.newsitems.length
+            && game.most_recent_update.title
+              !== allPatchNotes[i].data.appnews.newsitems[0].title
+          ) {
+            game.most_recent_update = allPatchNotes[i].data.appnews.newsitems[0];
+            Games.findOneAndUpdate({ id: game.id }, game).catch((err) => console.error('khjbsdcisbvk', err));
+            Promise.all(
+              users
+                .map((user) => {
+                  if (user.gameSubscriptions.includes(game.id)) {
+                    const text = `**New Update**\n${game.name}\n${game.most_recent_update.title}\n${game.most_recent_update.url}`;
+                    return axios.post(
+                      `https://api.telegram.org/bot${botToken}/sendMessage`,
+                      {
+                        chat_id: user.chatId,
+                        text,
+                      },
+                    ).catch((err) => console.error(err));
+                  }
+                  return null;
+                })
+                .filter((a) => a !== null),
+            );
+          }
+        });
+        res.sendStatus(200);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.sendStatus(500);
       });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.sendStatus(500);
-    });
+  });
 });
-
+// setTimeout(fifif, 24 * 60 * 60 * 1000)
 module.exports = game;

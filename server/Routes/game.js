@@ -27,7 +27,7 @@ const saveGame = async (game) => {
     achievements: [],
     release_date: game.release_date,
     user_reviews: [],
-    most_recent_update: '',
+    most_recent_update: {},
   };
   try {
     const { data } = await axios.get(`https://api.achievementstats.com/games/${dbGame.id}/achievements/?key=${process.env.STEAM_ACHIEVE_KEY}`);

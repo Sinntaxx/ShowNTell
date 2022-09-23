@@ -32,5 +32,6 @@ module.exports = {
     'jsx-a11y/heading-has-content': 0,
     camelcase: 0,
     'no-param-reassign': 0,
+    'prefer-destructuring': 0,
   },
 };

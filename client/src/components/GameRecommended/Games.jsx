@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './games.css';
-import { get } from 'jquery';
+import Loading from './Loading.jsx';
 
 const Games = () => {
   const [games, setGames] = useState(() => [{ name: 'test', price_overview: { final: '10' } }]);
@@ -58,7 +58,7 @@ const Games = () => {
                   $
                   {
                 game.price_overview ? Number(game.price_overview.final) / 100
-                  : game.package_groups.subs.price_in_cents_with_discount / 100
+                  : game.package_groups.subs[0].price_in_cents_with_discount / 100
               }
                 </b>
               </h5>

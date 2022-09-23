@@ -258,6 +258,9 @@ game.post('/updates', (req, res) => {
 game.get('/subscribe', (req, res) => {
   Users.findOne({ id: req.cookies.ShowNTellId })
     .then((userInfo) => {
+      if (userInfo.gameSubscriptions.length === 0) {
+        res.status(404).send('error on the server');
+      }
       Promise.all(userInfo.gameSubscriptions.map((game) => Games.findOne({ id: game })))
         .then((results) => {
           const g = [];

@@ -1,9 +1,9 @@
 import React from 'react';
 
-const VideoGameEntry = ({ ele }) => {
+const VideoGameEntry = ({ game }) => {
   return (
     <h2>
-      {ele}
+      { game }
     </h2>
   );
 };

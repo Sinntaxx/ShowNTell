@@ -1,17 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import VideoGameEntry from './VideoGameEntry.jsx';
 import './videogame.css';
 
 const VideoGameList = () => {
   const dummyData = ['Elden Ring', 'Dark Souls 2', 'Goat Simulator'];
-  const [videoGamesFromSteam, setVideoGamesFromSteam] = useState([]);
-  // const [data, setData] = useState([]);
-  // const [isThere, setIsThere] = useState(false);
+  const [videoGamesFromDB, setVideoGamesFromDB] = useState([]);
+  const [isVideoGameThere, setVideoGameIsThere] = useState(false);
+  const [enteredVideoGame, setEnteredVideoGame] = useState('');
 
-  // useEffect(() => {
-  //   setData(dummyData);
-  //   setIsThere(true);
-  // }, [data]);
+  const handleSubmissionClick = () => {
+    // console.log('value→', document.getElementById('game-name').value);
+    // console.log(e.target.value);
+    // setEnteredVideoGame(document.getElementById('game-name').value);
+    // setEnteredVideoGame(e.target.value);
+    // console.log(enteredVideoGame);
+    axios.get(`/game/byname/${enteredVideoGame}`)
+      .then(({ data }) => {
+        setVideoGamesFromDB(data);
+        setVideoGameIsThere(true);
+      })
+
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   return (
     <>
@@ -19,15 +32,15 @@ const VideoGameList = () => {
       <link href="https://fonts.googleapis.com/css2?family=Work+Sans&display=swap" rel="stylesheet" />
       <div>
         <form>
-          <label htmlFor="game-name" className="video-game-search-label"><input type="text" id="game-name" game="game-name" /></label>
-
+          <label htmlFor="game-name" className="video-game-search-label">
+            <input type="text" id="game-name" game="game-name" onChange={(e) => { setEnteredVideoGame(e.target.value); }} />
+          </label>
         </form>
-        <button className="video-game-submit-button">submit</button>
+        <button className="video-game-submit-button" onClick={handleSubmissionClick}>submit</button>
       </div>
       <div>
-        { dummyData.map((ele) => <VideoGameEntry ele={ele} />) }
+        { isVideoGameThere ? videoGamesFromDB.map((game) => <VideoGameEntry game={game} />) : 'Games will populate here'}
       </div>
-
     </>
   );
 };

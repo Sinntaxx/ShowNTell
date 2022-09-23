@@ -88,6 +88,9 @@ const App = () => {
             }
           });
           setUsers(buildFollowers);
+        })
+        .catch((err) => {
+          console.error(err);
         });
     }
   };

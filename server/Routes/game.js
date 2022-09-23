@@ -1,11 +1,69 @@
 const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const express = require('express');
 const axios = require('axios');
+const { json } = require('body-parser');
 const { Users, Games, Notifications } = require('../db/schema.js');
 
 const game = express.Router();
 
-game.get('/:name', (req, res) => {
+// save game in database
+const saveGame = async (game) => {
+  // game is formatted from steam store api for db
+  const dbGame = {
+    id: game.steam_appid,
+    description: game.detailed_description,
+    short_desc: game.short_description,
+    about: game.about_the_game,
+    header_image: game.header_image,
+    requirements: game.pc_requirements,
+    developers: game.developers,
+    price: game.price_overview,
+    package: game.package_groups.subs,
+    platforms: game.platforms,
+    categories: game.categories,
+    genres: game.genres,
+    screenshots: game.screenshots,
+    movies: game.movies,
+    achievements: [],
+    release_date: game.release_date,
+    user_reviews: [],
+    most_recent_update: '',
+  };
+  try {
+    const { data } = await axios.get(`https://api.achievementstats.com/games/${dbGame.id}/achievements/?key=${process.env.STEAM_ACHIEVE_KEY}`);
+
+    const achievs = data.map((ach) => {
+      return {
+        name: ach.name,
+        desc: ach.description,
+        imgLocked: `https://www.achievementstats.com/${ach.iconLocked}`,
+        imgUnlocked: `https://www.achievementstats.com/${ach.iconUnlocked}`,
+      };
+    });
+    dbGame.achievements = achievs;
+    await Games.create(dbGame);
+    return 'database Game created!';
+  } catch (err) {
+    console.error('error getting achievements\n', err);
+  }
+};
+
+// testing saveGame with request, remove later
+game.post('/newgame', (req, res) => {
+  const newGame = req.body;
+  return saveGame(newGame)
+    .then((data) => {
+      console.log('data returned\n', data);
+      res.sendStatus(201);
+    })
+    .catch((err) => {
+      console.error('error on request\n', err);
+      res.sendStatus(500);
+    });
+});
+
+// find games by name
+game.get('/byname/:name', (req, res) => {
   console.log('name from parameters', req.params);
   const { name } = req.params;
   axios
@@ -14,21 +72,31 @@ game.get('/:name', (req, res) => {
       if (!data.length) {
         res.sendStatus(404);
       }
-      if (data.length > 1) {
-        // return data.map((game) => {
-        //   return axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
-        // })
-      }
-      const gameId = data[0].appid;
-      // console.log('gameobj from steam\n', data, '\n\ngameid returned from api', gameId);
-      axios
-        .get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
-        .then(({ data }) => {
-          const game = data[gameId].data;
-          console.log('data returned from store api', game);
+
+      const gameIds = data.map((game) => {
+        const gameId = game.appid;
+        return axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
+          .then(({ data }) => {
+            const gameObj = data[gameId].data;
+            return gameObj;
+          })
+          .catch((err) => {
+            console.error('error on request\n', err);
+          });
+      });
+      return gameIds;
+    })
+    .then((promiseArr) => {
+      // console.log('array of promises?\n\n', promiseArr);
+      const theTruth = Promise.resolve(Promise.all(promiseArr));
+      return theTruth
+        .then((data) => {
+          console.log('theTruths data\n', data);
+          res.sendStatus(200);
         })
         .catch((err) => {
-          console.error('error getting data by id\n', err);
+          console.error('error on request\n', err);
+          res.sendStatus(500);
         });
     })
     .catch((err) => {
@@ -36,6 +104,9 @@ game.get('/:name', (req, res) => {
       res.sendStatus(500);
     });
 });
+
+// path to get all achievements for a individual user;
+//  game.get('/user/achievements/:userId')
 
 // this endpoint will get games by a genre and take return the first 10.
 game.post('/genre', (req, res) => {
@@ -157,6 +228,22 @@ game.get('/updates', (req, res) => {
     .catch((err) => {
       console.error(err);
       res.sendStatus(500);
+    });
+});
+// testing
+game.get('/subscribe', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then((userInfo) => {
+      Promise.all(userInfo.gameSubscriptions.map((game) => Games.findOne({ id: game })))
+        .then((results) => {
+          const g = [];
+          results.forEach((result) => result.genres.forEach((genre) => g.push(genre.description)));
+          res.status(200).send(g[(Math.floor(Math.random() * ((g.length - 1) - 0 + 1)) + 0)]);
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(404).send('error on the server');
+        });
     });
 });
 

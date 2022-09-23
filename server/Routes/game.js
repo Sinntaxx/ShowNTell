@@ -162,13 +162,12 @@ game.post('/newUser', (req, res) => {
 // url to have user click: https://telegram.me/GameAndWatchBot?start=${userId}
 
 // Url for getting news about a game by its id:  http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${game.id}&count=5&format=json
-// Endpoint for finding out if any games have been updated
+// Endpoint for finding out if any games have been updated and notifying subscribed users
 game.post('/updates', (req, res) => {
   let allPatchNotes;
   Users.find({ notifs: true }).then((users) => {
     Games.find({})
       .then((games) => {
-        // Might be able to use just promise.all without promise.resolve
         return Promise.all(
           games.map((game) => axios
             .get(
@@ -230,6 +229,7 @@ game.post('/updates', (req, res) => {
   });
 });
 // setTimeout(fifif, 24 * 60 * 60 * 1000)
+
 // testing
 game.get('/subscribe', (req, res) => {
   Users.findOne({ id: req.cookies.ShowNTellId })

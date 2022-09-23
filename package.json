@@ -68,7 +68,8 @@
     "style-loader": "^2.0.0",
     "styled-components": "^5.2.3",
     "twilio": "^3.60.0",
-    "url-loader": "^4.1.1"
+    "url-loader": "^4.1.1",
+    "@mui/material": "5.10.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

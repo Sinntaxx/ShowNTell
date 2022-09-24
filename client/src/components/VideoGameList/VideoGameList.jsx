@@ -40,7 +40,7 @@ const VideoGameList = ({ user }) => {
         <button className="video-game-submit-button" onClick={handleSubmissionClick}>submit</button>
       </div>
       <div>
-        { isVideoGameThere ? videoGamesFromDB.map((game) => <VideoGameEntry game={game} user={user} />) : 'Games will populate here'}
+        { videoGamesFromDB.length ? videoGamesFromDB.map((game) => <VideoGameEntry game={game} user={user} />) : 'Games will populate here'}
       </div>
     </>
   );

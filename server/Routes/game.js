@@ -103,8 +103,9 @@ game.get('/byname/:name', (req, res) => {
       const theTruth = Promise.resolve(Promise.all(promiseArr));
       return theTruth
         .then((data) => {
-          // console.log('theTruths data\n', data);
-          res.status(200).send(data);
+          const games = data.flat();
+          console.log(games);
+          res.status(200).send(games);
         })
         .catch((err) => {
           console.error('error on request\n', err);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './homefeed.css';
 import { FaHeart, FaRegCommentDots, FaTimes, FaHandshake } from 'react-icons/fa';
@@ -39,13 +39,21 @@ const FeedItem = ({ post, user = {}, setPosts, setUser }) => {
 
   const [follow, setFollow] = useState(isFollowing());
   const getShow = () => {
-    console.log(currentPost);
     if (!show) {
-      axios(`/postShow/${currentPost.topic_id}`).then(({ data }) => {
-        setShow(data.name);
-      }).catch((err) => {
-        console.error(err);
-      });
+      if (currentPost.type === 'game') {
+        axios(`/postGame/${currentPost.topic_id}`).then(({ data }) => {
+          setShow(data.name);
+          console.log(data);
+        }).catch((err) => {
+          console.error(err);
+        });
+      } else {
+        axios(`/postShow/${currentPost.topic_id}`).then(({ data }) => {
+          setShow(data.name);
+        }).catch((err) => {
+          console.error(err);
+        });
+      }
     }
   };
 
@@ -84,13 +92,14 @@ const FeedItem = ({ post, user = {}, setPosts, setUser }) => {
         .then(setFollow(true));
     }
   };
-
+  useEffect(() => {
+    getShow();
+    getName();
+    getLike();
+  }, [show, name, like]);
   return (
     <div>
       <div className="main-post-container">
-        {getShow()}
-        {getName()}
-        {getLike()}
         <h2 className="post-show">{`${show}`}</h2>
         <div id="post-show-title">{`${currentPost.title}`}</div>
         <h4 className="post-author">{`${name}`}</h4>

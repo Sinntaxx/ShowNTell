@@ -4,29 +4,27 @@ import VideoGameEntry from './VideoGameEntry.jsx';
 import './videogame.css';
 
 const VideoGameList = ({ user }) => {
-  const dummyData = ['Elden Ring', 'Dark Souls 2', 'Goat Simulator'];
+  // const dummyData = ['Elden Ring', 'Dark Souls 2', 'Goat Simulator'];
   const [videoGamesFromDB, setVideoGamesFromDB] = useState([]);
   const [isVideoGameThere, setVideoGameIsThere] = useState(false);
   const [enteredVideoGame, setEnteredVideoGame] = useState('');
 
   const handleSubmissionClick = () => {
-    // console.log('value→', document.getElementById('game-name').value);
-    // console.log(e.target.value);
-    // setEnteredVideoGame(document.getElementById('game-name').value);
-    // setEnteredVideoGame(e.target.value);
-    // console.log(enteredVideoGame);
     axios.get(`/game/byname/${enteredVideoGame}`)
       .then(({ data }) => {
         console.log('data from db', data);
         setVideoGamesFromDB(data);
         setVideoGameIsThere(true);
       })
-
       .catch((err) => {
         console.error(err);
       });
   };
 
+  const handleInputChange = (e) => {
+    const enteredGame = e.target.value;
+    setEnteredVideoGame(enteredGame);
+  };
   return (
     <>
       <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@700&display=swap" rel="stylesheet" />
@@ -34,13 +32,20 @@ const VideoGameList = ({ user }) => {
       <div>
         <form>
           <label htmlFor="game-name" className="video-game-search-label">
-            <input type="text" id="game-name" name="game-name" onChange={(e) => { setEnteredVideoGame(e.target.value); }} />
+            Search for a videogame!
+            <input
+              type="text"
+              id="game-name"
+              game="game-name"
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmissionClick}
+              onChange={handleInputChange}
+            />
           </label>
         </form>
         <button className="video-game-submit-button" onClick={handleSubmissionClick}>submit</button>
       </div>
       <div>
-        { videoGamesFromDB.length ? videoGamesFromDB.map((game) => <VideoGameEntry game={game} user={user} />) : 'Games will populate here'}
+        { isVideoGameThere ? videoGamesFromDB.map((game, i) => <VideoGameEntry key={`${game}: ${i}`} game={game} user={user} />) : <h3 className="text">Games will populate here →</h3>}
       </div>
     </>
   );

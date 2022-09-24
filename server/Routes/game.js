@@ -10,7 +10,6 @@ const game = express.Router();
 const saveGame = async (game) => {
   // game is formatted from steam store api for db
   const dbGame = {
-    name: game.name,
     id: game.steam_appid,
     description: game.detailed_description,
     short_desc: game.short_description,
@@ -167,7 +166,20 @@ game.post('/genre', (req, res) => {
       for (let i = 0; i < 10; i += 1) {
         top10Games.push(response.data[keys[i]]);
       }
-      res.status(200).send(JSON.stringify(top10Games));
+
+      Promise.all(top10Games.map((game) => {
+        const getGameInfo = {
+          method: 'get',
+          url: `https://store.steampowered.com/api/appdetails?appids=${game.appid}`,
+          headers: {},
+        };
+        return axios(getGameInfo);
+      }))
+        .then((gamesInfo) => res.status(201).send(JSON.stringify(gamesInfo.map((gameInfo, i) => gameInfo.data[top10Games[i].appid].data))))
+        .catch((err) => {
+          console.log(err);
+          res.status(404).send('Error in the request to the steam api');
+        });
     })
     .catch((err) => {
       console.log(err);
@@ -281,6 +293,9 @@ game.post('/updates', (req, res) => {
 game.get('/subscribe', (req, res) => {
   Users.findOne({ id: req.cookies.ShowNTellId })
     .then((userInfo) => {
+      if (userInfo.gameSubscriptions.length === 0) {
+        res.status(404).send('error on the server');
+      }
       Promise.all(userInfo.gameSubscriptions.map((game) => Games.findOne({ id: game })))
         .then((results) => {
           const g = [];
@@ -306,6 +321,38 @@ game.put('/subscribe/:id', (req, res) => {
       console.error('couldn\'t subscribe', err);
       res.sendStatus(404);
     });
+});
+
+// unsubscribe a videogame for a user by game id
+game.put('/unsubscribe', (req, res) => {
+  console.log(req.body);
+  const { game, subscriptions } = req.body;
+  const subscriptionLocation = subscriptions.indexOf(game.toString());
+  const newSubs = subscriptions;
+  newSubs.splice(subscriptionLocation, 1);
+  console.log(subscriptions);
+  console.log('new', newSubs);
+});
+
+game.get('/subscribed/:id', (req, res) => {
+  Games.findOne({ id: req.params.id })
+    .then((game) => {
+      res.send(game).status(200);
+    })
+    .catch();
+});
+game.post('/reviews', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then((data) => {
+      const userReviews = data.user_reviews;
+      Users.updateOne(
+        { id: req.cookies.ShowNTellId },
+        {
+          $push: { user_reviews: req.body.review },
+        },
+      ).then((data) => res.status(201).send(JSON.stringify(data)));
+    })
+    .catch((err) => console.log(err));
 });
 
 module.exports = game;

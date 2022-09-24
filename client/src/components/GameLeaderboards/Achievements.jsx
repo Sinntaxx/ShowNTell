@@ -18,13 +18,21 @@ const Achievements = () => {
     <List
       sx={{
         width: '100%',
-        dense: true,
         maxWidth: 360,
         maxHeight: 360,
-        bgcolor: 'background.paper',
+        bgcolor: '#212121',
       }}
+      subheader={(
+        <ListSubheader sx={{
+          color: '#5c637b',
+          bgcolor: '#212121',
+        }}
+        >
+          Achievements
+        </ListSubheader>
+)}
     >
-      <ListSubheader bgcolor="inherit">Achievements</ListSubheader>
+
       <ListItem alignItems="center">
         <ListItemIcon>
           <img alt="" src={achiev.imgLocked} />
@@ -32,6 +40,12 @@ const Achievements = () => {
         <ListItemText
           primary={achiev.name}
           secondary={achiev.desc}
+          sx={{
+            color: '#5c637b',
+          }}
+          secondaryTypographyProps={{
+            color: '#5c637b',
+          }}
         />
       </ListItem>
     </List>

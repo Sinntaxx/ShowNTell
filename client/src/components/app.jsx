@@ -314,7 +314,7 @@ const App = () => {
       );
     }
     if (view === 'videoGames') {
-      return <VideoGameList viewSwitcher={viewSwitcher} />;
+      return <VideoGameList viewSwitcher={viewSwitcher} user={user} />;
     }
     // Should show the games view
     if (view === 'recGames') {

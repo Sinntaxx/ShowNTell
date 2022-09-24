@@ -10,6 +10,7 @@ const game = express.Router();
 const saveGame = async (game) => {
   // game is formatted from steam store api for db
   const dbGame = {
+    name: game.name,
     id: game.steam_appid,
     description: game.detailed_description,
     short_desc: game.short_description,
@@ -102,8 +103,9 @@ game.get('/byname/:name', (req, res) => {
       const theTruth = Promise.resolve(Promise.all(promiseArr));
       return theTruth
         .then((data) => {
-          // console.log('theTruths data\n', data);
-          res.sendStatus(200);
+          const games = data.flat();
+          // console.log(games);
+          res.status(200).send(games);
         })
         .catch((err) => {
           console.error('error on request\n', err);
@@ -261,14 +263,29 @@ game.get('/subscribe', (req, res) => {
     });
 });
 
-game.get('/subscribed/:id', (req, res) => {
-  console.log(req.params);
-  Users.findOne({ id: req.params.id })
-    .then((user) => {
-      console.log(user, 'user sub......');
-      res.send(user.gameSubscriptions).status(200);
+// subscribing a user to a game by it's id
+game.put('/subscribe/:id', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then(({ gameSubscriptions }) => {
+      gameSubscriptions.push(req.params.id);
+      return Users.updateOne({ id: req.cookies.ShowNTellId }, { gameSubscriptions });
     })
-    .catch();
+    .then(() => res.status(201).send('successfully subscribed!'))
+    .catch((err) => {
+      console.error('couldn\'t subscribe', err);
+      res.sendStatus(404);
+    });
+});
+
+// unsubscribe a videogame for a user by game id
+game.put('/unsubscribe', (req, res) => {
+  console.log(req.body);
+  const { game, subscriptions } = req.body;
+  const subscriptionLocation = subscriptions.indexOf(game.toString());
+  const newSubs = subscriptions;
+  newSubs.splice(subscriptionLocation, 1);
+  console.log(subscriptions);
+  console.log('new', newSubs);
 });
 
 module.exports = game;

@@ -89,6 +89,9 @@ const App = () => {
             }
           });
           setUsers(buildFollowers);
+        })
+        .catch((err) => {
+          console.error(err);
         });
     }
   };
@@ -215,6 +218,9 @@ const App = () => {
     if (view === 'DMs') {
       return <DMs user={user} setUser={setUser} />;
     }
+    if (view === 'gameNotifs') {
+      return <meta httpEquiv="Refresh" content={`0; url='https://telegram.me/GameAndWatchBot?start=${user.id}'`} />;
+    }
     if (view === 'notifs') {
       return <Notifs user={user} setUser={setUser} />;
     }
@@ -245,7 +251,7 @@ const App = () => {
       return <MovieFeed movieId={movieId} subscribe={subscribeMovie} viewSwitcher={viewSwitcher} />;
     }
     if (view === 'videoGames') {
-      return <VideoGameList viewSwitcher={viewSwitcher} />;
+      return <VideoGameList viewSwitcher={viewSwitcher} user={user} />;
     }
     // Should show the games view
     if (view === 'recGames') {

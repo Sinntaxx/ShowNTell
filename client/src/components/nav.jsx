@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { FaHome, FaStar, FaPen, FaBell, FaEnvelope, FaSearch, FaDoorOpen, FaLinkedin, FaUnity, FaHandshake, FaFingerprint, FaSteamSymbol, FaFighterJet, FaTrophy } from 'react-icons/fa';
+import { FaHome, FaStar, FaPen, FaBell, FaEnvelope, FaSearch, FaDoorOpen, FaLinkedin, FaUnity, FaHandshake, FaFingerprint, FaSteamSymbol, FaFantasyFlightGames, FaTrophy } from 'react-icons/fa';
 import logo from './HomePage/img/logo1.png';
+// import Notifications from './HomePage/Notifications.jsx';
 
 const Nav = ({ user, onClick, logout, search, setSearch, onSearch, onSearchTwo }) => (
   <div>
@@ -36,16 +37,22 @@ const Nav = ({ user, onClick, logout, search, setSearch, onSearch, onSearchTwo }
         <FaPen />
         {' '}
       </li>
-      <li onClick={() => onClick('notifs')} className="views" title="notifications">
+      <li onClick={() => onClick('notifs')} className="views" title="general notifications">
         <FaBell />
         {' '}
       </li>
+      {!user.notifs ? (
+        <li onClick={() => onClick('gameNotifs')} className="views" title="game update notifications">
+          <FaBell />
+          {' '}
+        </li>
+      ) : null}
       <li onClick={() => onClick('DMs')} className="views" title="messages">
         <FaEnvelope />
         {' '}
       </li>
       <li onClick={() => onClick('videoGames')} className="views" title="videoGames">
-        <FaFighterJet />
+        <FaFantasyFlightGames />
         {' '}
       </li>
       <li onClick={() => onClick('recGames')} className="views" title="recGames">

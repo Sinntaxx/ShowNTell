@@ -28,7 +28,7 @@ const saveGame = async (game) => {
     achievements: [],
     release_date: game.release_date,
     user_reviews: [],
-    most_recent_update: {},
+    most_recent_update: { title: '', url: '' },
   };
   try {
     const check = await Games.find({ id: dbGame.id });
@@ -104,6 +104,7 @@ game.get('/byname/:name', (req, res) => {
       return theTruth
         .then((data) => {
           const games = data.flat();
+          // console.log(games);
           res.status(200).send(games);
         })
         .catch((err) => {
@@ -150,13 +151,14 @@ game.post('/newUser', (req, res) => {
     // This is the user token to associate the user in the database with the user on telegram
     const userToken = message.text.split(' ')[1];
     const chatId = message.chat.id;
+    console.log('arrived');
     axios
       .post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         chat_id: chatId,
         text: 'You are now subscribed to notifications from Game&Watch',
       })
       .then(() => {
-        return Users.findOneAndUpdate({ id: userToken }, { chatId });
+        return Users.findOneAndUpdate({ id: userToken }, { chatId, notifs: true });
       })
       .then((result) => {
         console.log(result);
@@ -206,10 +208,12 @@ game.post('/updates', (req, res) => {
       })
       .then((games) => {
         games.forEach((game, i) => {
+          console.log(allPatchNotes[i].data.appnews.newsitems);
           if (
             allPatchNotes[i].data.appnews.newsitems.length
-            && game.most_recent_update.title
-              !== allPatchNotes[i].data.appnews.newsitems[0].title
+            && ((!game.most_recent_update)
+            || (game.most_recent_update.title
+              !== allPatchNotes[i].data.appnews.newsitems[0].title))
           ) {
             game.most_recent_update = allPatchNotes[i].data.appnews.newsitems[0];
             Games.findOneAndUpdate({ id: game.id }, game).catch((err) => console.error('khjbsdcisbvk', err));
@@ -256,6 +260,20 @@ game.get('/subscribe', (req, res) => {
           console.log(err);
           res.status(404).send('error on the server');
         });
+    });
+});
+
+// subscribing a user to a game by it's id
+game.put('/subscribe/:id', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then(({ gameSubscriptions }) => {
+      gameSubscriptions.push(req.params.id);
+      return Users.updateOne({ id: req.cookies.ShowNTellId }, { gameSubscriptions });
+    })
+    .then(() => res.status(201).send('successfully subscribed!'))
+    .catch((err) => {
+      console.error('couldn\'t subscribe', err);
+      res.sendStatus(404);
     });
 });
 

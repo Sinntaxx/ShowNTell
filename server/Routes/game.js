@@ -10,6 +10,7 @@ const game = express.Router();
 const saveGame = async (game) => {
   // game is formatted from steam store api for db
   const dbGame = {
+    name: game.name,
     id: game.steam_appid,
     description: game.detailed_description,
     short_desc: game.short_description,
@@ -102,8 +103,8 @@ game.get('/byname/:name', (req, res) => {
       const theTruth = Promise.resolve(Promise.all(promiseArr));
       return theTruth
         .then((data) => {
-          // console.log('theTruths data\n', data);
-          res.sendStatus(200);
+          const games = data.flat();
+          res.status(200).send(games);
         })
         .catch((err) => {
           console.error('error on request\n', err);

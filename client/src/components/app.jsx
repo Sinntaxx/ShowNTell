@@ -25,6 +25,7 @@ import MovieFeed from './Subscriptions/MovieFeed.jsx';
 import FriendList from './FriendList/friendList.jsx';
 import VideoGameList from './VideoGameList/VideoGameList.jsx';
 import Games from './GameRecommended/Games.jsx';
+import Leaderboards from './GameLeaderboards/Leaderboards.jsx';
 
 const App = () => {
   const [posts, setPosts] = useState();
@@ -249,6 +250,9 @@ const App = () => {
     // Should show the games view
     if (view === 'recGames') {
       return <Games />;
+    }
+    if (view === 'leaderboards') {
+      return <Leaderboards />;
     }
   };
 

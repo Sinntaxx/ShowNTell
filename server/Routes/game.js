@@ -138,7 +138,7 @@ game.post('/genre', (req, res) => {
       Promise.all(top10Games.map((game) => {
         const getGameInfo = {
           method: 'get',
-          url: `http://store.steampowered.com/api/appdetails?appids=${game.appid}`,
+          url: `https://store.steampowered.com/api/appdetails?appids=${game.appid}`,
           headers: {},
         };
         return axios(getGameInfo);

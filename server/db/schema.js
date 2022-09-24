@@ -6,7 +6,7 @@ const userSchema = mongoose.Schema({
   posts: Array,
   messages: Array,
   phone: String,
-  notifs: Array,
+  notifs: Boolean,
   follows: Array,
   subscriptions: Array,
   movieSubscriptions: Array,
@@ -40,6 +40,7 @@ const Movies = mongoose.model('Movies', movieSchema);
 
 const postSchema = mongoose.Schema({
   user: String,
+  type: String,
   topic_id: String,
   title: String,
   content: {
@@ -49,7 +50,6 @@ const postSchema = mongoose.Schema({
   comment: Array,
   createdAt: Date,
   likes: Array,
-  type: String,
 });
 
 const Posts = mongoose.model('Posts', postSchema);
@@ -69,6 +69,7 @@ const gameSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  name: String,
   description: String,
   short_desc: String,
   about: String,
@@ -85,7 +86,7 @@ const gameSchema = mongoose.Schema({
   achievements: Object,
   release_date: Object,
   user_reviews: Array,
-  most_recent_update: String,
+  most_recent_update: Object,
 });
 
 const Games = mongoose.model('Game', gameSchema);

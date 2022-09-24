@@ -10,6 +10,7 @@ const game = express.Router();
 const saveGame = async (game) => {
   // game is formatted from steam store api for db
   const dbGame = {
+    name: game.name,
     id: game.steam_appid,
     description: game.detailed_description,
     short_desc: game.short_description,
@@ -27,9 +28,15 @@ const saveGame = async (game) => {
     achievements: [],
     release_date: game.release_date,
     user_reviews: [],
-    most_recent_update: '',
+    most_recent_update: {},
   };
   try {
+    const check = await Games.find({ id: dbGame.id });
+
+    if (check.length) {
+      // console.error('already found in database!');
+      return check;
+    }
     const { data } = await axios.get(`https://api.achievementstats.com/games/${dbGame.id}/achievements/?key=${process.env.STEAM_ACHIEVE_KEY}`);
 
     const achievs = data.map((ach) => {
@@ -42,7 +49,7 @@ const saveGame = async (game) => {
     });
     dbGame.achievements = achievs;
     await Games.create(dbGame);
-    return 'database Game created!';
+    return dbGame;
   } catch (err) {
     console.error('error getting achievements\n', err);
   }
@@ -53,7 +60,7 @@ game.post('/newgame', (req, res) => {
   const newGame = req.body;
   return saveGame(newGame)
     .then((data) => {
-      console.log('data returned\n', data);
+      // console.log('data returned\n', data);
       res.sendStatus(201);
     })
     .catch((err) => {
@@ -62,7 +69,7 @@ game.post('/newgame', (req, res) => {
     });
 });
 
-// find games by name
+// find games by name and save to db
 game.get('/byname/:name', (req, res) => {
   console.log('name from parameters', req.params);
   const { name } = req.params;
@@ -78,7 +85,12 @@ game.get('/byname/:name', (req, res) => {
         return axios.get(`https://store.steampowered.com/api/appdetails?appids=${gameId}`)
           .then(({ data }) => {
             const gameObj = data[gameId].data;
-            return gameObj;
+            // console.log('game object\n', gameObj)
+            return saveGame(gameObj);
+          })
+          .then((data) => {
+            // console.log('data returned from saveGame\n', data);
+            return data;
           })
           .catch((err) => {
             console.error('error on request\n', err);
@@ -91,8 +103,8 @@ game.get('/byname/:name', (req, res) => {
       const theTruth = Promise.resolve(Promise.all(promiseArr));
       return theTruth
         .then((data) => {
-          console.log('theTruths data\n', data);
-          res.sendStatus(200);
+          // console.log('theTruths data\n', data);
+          res.status(200).send(data);
         })
         .catch((err) => {
           console.error('error on request\n', err);
@@ -130,6 +142,7 @@ game.post('/genre', (req, res) => {
       res.status(404).send('Error in the request to the steam api');
     });
 });
+
 // url to notify webpage that a user has started a chat with the bot: https://${siteUrl}/game/newUser
 game.post('/newUser', (req, res) => {
   const { message } = req.body;
@@ -142,7 +155,6 @@ game.post('/newUser', (req, res) => {
         chat_id: chatId,
         text: 'You are now subscribed to notifications from Game&Watch',
       })
-      .then()
       .then(() => {
         return Users.findOneAndUpdate({ id: userToken }, { chatId });
       })
@@ -162,74 +174,74 @@ game.post('/newUser', (req, res) => {
 // url to have user click: https://telegram.me/GameAndWatchBot?start=${userId}
 
 // Url for getting news about a game by its id:  http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${game.id}&count=5&format=json
-// Endpoint for finding out if any games have been updated
-game.get('/updates', (req, res) => {
+// Endpoint for finding out if any games have been updated and notifying subscribed users
+game.post('/updates', (req, res) => {
   let allPatchNotes;
-  let notifications;
-  Notifications.find({})
-    .then((notifs) => {
-      console.log('notifs: ', notifs);
-      notifications = notifs;
-      // Might be able to use just promise.all without promise.resolve
-      return Promise.resolve(
-        Promise.all(
-          notifs.map((notif) => axios.post(
-            `http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${notif.gameId}&count=10&format=json`,
-          )),
-        ),
-      );
-    })
-    .then((allNews) => {
-      console.log('allNews: ', allNews);
-      allPatchNotes = allNews.map((gameNews) => {
-        gameNews.appNews.newsItems = gameNews.appNews.newsItems.filter(
-          (news) => news.tags && news.tags.includes('patchnotes'),
-        );
-        return gameNews;
-      });
-      return Promise.resolve(
-        Promise.all(
-          allPatchNotes.map((patchNotes) => Games.findOne({ id: patchNotes.appNews.appid })),
-        ),
-      );
-    })
-    .then((games) => {
-      console.log('games: ', games);
-      games.forEach((game, i) => {
-        if (
-          game.most_recent_update.title
-          !== allPatchNotes[i].appNews.newsItems[0].title
-        ) {
-          game.most_recent_update = allPatchNotes[i].appNews.newsItems[0].title;
-          Games.findOneAndUpdate(game, game);
-          notifications.forEach((notification) => Users.findOne({ id: notification.userId })
-            .then((user) => {
-              console.log('user: ', user);
-              return Promise.resolve(Promise.all(notifications.map((noti) => {
-                if (noti.gameId === game.id && noti.userId === user.id) {
-                  const text = `**New Update**\n${game.name}\n${game.most_recent_update.title}\n${game.url}`;
-                  return axios.post(
-                    `https://api.telegram.org/bot${botToken}/sendMessage`,
-                    {
-                      chat_id: user.chatId,
-                      text,
-                    },
-                  );
-                }
-                return null;
-              }).filter((a) => a !== null)));
+  Users.find({ notifs: true }).then((users) => {
+    Games.find({})
+      .then((games) => {
+        return Promise.all(
+          games.map((game) => axios
+            .get(
+              `http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${game.id}&count=100&format=json`,
+            )
+            .then((results) => {
+              return results;
             })
-            .then(() => {
-              res.sendStatus(200);
-            }));
-        }
+            .catch((err) => {
+              console.error(err);
+            })),
+        );
+      })
+      .then((allNews) => {
+        allPatchNotes = allNews.map((gameNews) => {
+          gameNews.data.appnews.newsitems = gameNews.data.appnews.newsitems.filter(
+            (news) => news.tags && news.tags.includes('patchnotes'),
+          );
+          return gameNews;
+        });
+        return Promise.all(
+          allPatchNotes.map((patchNotes) => Games.findOne({ id: patchNotes.data.appnews.appid })),
+        );
+      })
+      .then((games) => {
+        games.forEach((game, i) => {
+          if (
+            allPatchNotes[i].data.appnews.newsitems.length
+            && game.most_recent_update.title
+              !== allPatchNotes[i].data.appnews.newsitems[0].title
+          ) {
+            game.most_recent_update = allPatchNotes[i].data.appnews.newsitems[0];
+            Games.findOneAndUpdate({ id: game.id }, game).catch((err) => console.error('khjbsdcisbvk', err));
+            Promise.all(
+              users
+                .map((user) => {
+                  if (user.gameSubscriptions.includes(game.id)) {
+                    const text = `**New Update**\n${game.name}\n${game.most_recent_update.title}\n${game.most_recent_update.url}`;
+                    return axios.post(
+                      `https://api.telegram.org/bot${botToken}/sendMessage`,
+                      {
+                        chat_id: user.chatId,
+                        text,
+                      },
+                    ).catch((err) => console.error(err));
+                  }
+                  return null;
+                })
+                .filter((a) => a !== null),
+            );
+          }
+        });
+        res.sendStatus(200);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.sendStatus(500);
       });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.sendStatus(500);
-    });
+  });
 });
+// setTimeout(fifif, 24 * 60 * 60 * 1000)
+
 // testing
 game.get('/subscribe', (req, res) => {
   Users.findOne({ id: req.cookies.ShowNTellId })
@@ -244,6 +256,20 @@ game.get('/subscribe', (req, res) => {
           console.log(err);
           res.status(404).send('error on the server');
         });
+    });
+});
+
+// subscribing a user to a game by it's id
+game.put('/subscribe/:id', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then(({ gameSubscriptions }) => {
+      gameSubscriptions.push(req.params.id);
+      return Users.updateOne({ id: req.cookies.ShowNTellId }, { gameSubscriptions });
+    })
+    .then(() => res.status(201).send('successfully subscribed!'))
+    .catch((err) => {
+      console.error('couldn\'t subscribe', err);
+      res.sendStatus(404);
     });
 });
 

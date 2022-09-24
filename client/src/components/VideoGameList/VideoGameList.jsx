@@ -3,7 +3,7 @@ import axios from 'axios';
 import VideoGameEntry from './VideoGameEntry.jsx';
 import './videogame.css';
 
-const VideoGameList = () => {
+const VideoGameList = ({ user }) => {
   const dummyData = ['Elden Ring', 'Dark Souls 2', 'Goat Simulator'];
   const [videoGamesFromDB, setVideoGamesFromDB] = useState([]);
   const [isVideoGameThere, setVideoGameIsThere] = useState(false);
@@ -17,6 +17,7 @@ const VideoGameList = () => {
     // console.log(enteredVideoGame);
     axios.get(`/game/byname/${enteredVideoGame}`)
       .then(({ data }) => {
+        console.log('data from db', data);
         setVideoGamesFromDB(data);
         setVideoGameIsThere(true);
       })
@@ -39,7 +40,7 @@ const VideoGameList = () => {
         <button className="video-game-submit-button" onClick={handleSubmissionClick}>submit</button>
       </div>
       <div>
-        { isVideoGameThere ? videoGamesFromDB.map((game) => <VideoGameEntry game={game} />) : 'Games will populate here'}
+        { isVideoGameThere ? videoGamesFromDB.map((game) => <VideoGameEntry game={game} user={user} />) : 'Games will populate here'}
       </div>
     </>
   );

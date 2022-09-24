@@ -69,6 +69,22 @@ game.post('/newgame', (req, res) => {
     });
 });
 
+// get a single game by id
+game.get('/achievements/:gameId', (req, res) => {
+  const { gameId } = req.params;
+  const id = Number(gameId);
+  Games.findOne({ id })
+    .then((game) => {
+      // console.log('Game from database', game);
+      console.log('achievements\n', game.achievements);
+      res.status(200).send(game.achievements);
+    })
+    .catch((err) => {
+      console.error('error on finding game byId\n', err);
+      res.sendStatus(500);
+    });
+});
+
 // find games by name and save to db
 game.get('/byname/:name', (req, res) => {
   console.log('name from parameters', req.params);

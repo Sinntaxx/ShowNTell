@@ -70,14 +70,13 @@ game.post('/newgame', (req, res) => {
 });
 
 // get a single game by id
-game.get('/achievements/:gameId', (req, res) => {
+game.get('/byId/:gameId', (req, res) => {
   const { gameId } = req.params;
   const id = Number(gameId);
   Games.findOne({ id })
     .then((game) => {
-      // console.log('Game from database', game);
-      console.log('achievements\n', game.achievements);
-      res.status(200).send(game.achievements);
+      console.log('achievements\n', game);
+      res.status(200).send(game);
     })
     .catch((err) => {
       console.error('error on finding game byId\n', err);
@@ -130,6 +129,22 @@ game.get('/byname/:name', (req, res) => {
     })
     .catch((err) => {
       console.error('error requesting app id by name\n', err);
+      res.sendStatus(500);
+    });
+});
+
+// get all of users gameSubscriptions
+game.get('/subscriptions/:userId', (req, res) => {
+  const { userId } = req.params;
+  const id = Number(userId);
+
+  Users.findOne({ id })
+    .then(({ gameSubscriptions }) => {
+    // console.log('user gameSubs from db', gameSubscriptions);
+      res.status(200).send(gameSubscriptions);
+    })
+    .catch((err) => {
+      console.error('error on finding user\n', err);
       res.sendStatus(500);
     });
 });

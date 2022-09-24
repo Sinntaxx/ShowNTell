@@ -135,14 +135,15 @@ game.post('/genre', (req, res) => {
         top10Games.push(response.data[keys[i]]);
       }
 
-      Promise.all(top10Games.map((game) => {
+      const methods = top10Games.map((game) => {
         const getGameInfo = {
           method: 'get',
           url: `http://store.steampowered.com/api/appdetails?appids=${game.appid}`,
           headers: {},
         };
-        return axios(getGameInfo);
-      }))
+        return getGameInfo;
+      });
+      axios.all(methods.map((method) => axios(method)))
         .then((gamesInfo) => res.status(201).send(JSON.stringify(gamesInfo.map((gameInfo, i) => gameInfo.data[top10Games[i].appid].data))))
         .catch((err) => {
           console.log(err);

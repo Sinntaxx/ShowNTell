@@ -6,11 +6,14 @@ import axios from 'axios';
 
 import AchievementEntry from './AchievementEntry.jsx';
 
-const Achievements = ({ user, gameList, temp }) => {
+const Achievements = ({ user, gameList, currGame }) => {
   // select game to display achievements for
   const [game, setGame] = useState({});
 
-  // get users game subscriptions
+  // testing currGame
+  useEffect(() => {
+    console.log('currGame', currGame);
+  }, []);
   return (
     <List
       sx={{
@@ -31,7 +34,7 @@ const Achievements = ({ user, gameList, temp }) => {
         </ListSubheader>
       )}
     >
-      {temp.map((achiev) => <AchievementEntry achievement={achiev} />)}
+      {currGame.achievements.map((achiev) => <AchievementEntry achievement={achiev} />)}
 
     </List>
   );

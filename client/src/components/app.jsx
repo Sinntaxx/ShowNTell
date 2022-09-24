@@ -258,7 +258,7 @@ const App = () => {
       return <Games />;
     }
     if (view === 'leaderboards') {
-      return <Leaderboards />;
+      return <Leaderboards user={user} />;
     }
   };
 

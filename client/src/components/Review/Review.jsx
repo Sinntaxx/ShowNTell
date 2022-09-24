@@ -1,31 +1,27 @@
-/* eslint-disable no-console */
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import pic from './createpost.png';
-import './post.css';
-// import { Image } from '@cloudinary/react'
+import pic from '../CreatePost/createpost.png';
 
-const Post = ({ user, createPost }) => {
+const Review = ({ user, createPost }) => {
+  const [game, setGame] = useState('none');
+  const [gameSubs, setGameSubs] = useState([]);
+  const [gotSubs, setGotSubs] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [show, setShow] = useState('none');
-  const [error, setError] = useState('');
-  const [subs, setSubs] = useState([]);
-  const [gotSubs, setGotSubs] = useState(false);
-  const [movieSubs, setMovieSubs] = useState([]);
-  const [gotMovieSubs, setGotMovieSubs] = useState(false);
   const [img, setImg] = useState(null);
-
+  const [error, setError] = useState('');
   const uploadedImg = useRef(null);
   const imgUploader = useRef(null);
 
   const onClick = () => {
-    if (show !== 'none' && title !== '') {
+    if (game !== 'none' && title !== '') {
       if (img === null) {
+        console.log(game, 'game.....');
         createPost({
           title,
           content: { text: content, pic: img },
-          topic_id: show,
+          topic_id: game,
+          type: 'game',
           poster: user._id,
         });
         setTitle('');
@@ -37,7 +33,8 @@ const Post = ({ user, createPost }) => {
             createPost({
               title,
               content: { text: content, pic: id.data },
-              topic_id: show,
+              topic_id: game,
+              type: 'game',
               poster: user._id,
             });
           })
@@ -47,37 +44,63 @@ const Post = ({ user, createPost }) => {
       }
     } else if (title === '') {
       setError('Must have a title.');
-    } else if (show === 'none') {
-      setError('Please choose a show to talk about.');
+    } else if (game === 'none') {
+      setError('Please choose a game to review.');
     }
   };
 
   const getSubs = () => {
-    if (!gotSubs) {
-      const promises = user.subscriptions.map((showId) => axios.get(`/show/${showId}`).catch());
+    if (!gotSubs && user) {
+      // const endpoints = user.gameSubscriptions.map(
+      //   (sub) => `https://store.steampowered.com/api/appdetails?appids=${sub}`
+      // );
+      // axios
+      //   .all(endpoints.map((endpoint) => axios.get(endpoint)))
+      //   .then((result) => {
+      //     console.log("result",result);
+      //     setGotSubs(true);
+      //     setGameSubs(result);
+      //   })
+      //   .catch((err) => console.error(err));
+
+      const promises = user.gameSubscriptions.map((gameId) => axios.get(`/game/subscribed/${gameId}`)
+        .catch((err) => console.log(err)));
       Promise.all(promises)
-        .then((results) => results.map((sub) => sub.data))
-        .then((shows) => {
-          setSubs(shows);
-          setGotSubs(true);
+        .then((results) => {
+          return results.map((sub) => sub.data);
         })
-        .catch();
-    }
-  };
-  const getMovieSubs = () => {
-    if (!gotMovieSubs) {
-      const promises = user.movieSubscriptions.map((movieId) => axios.get(`/movie/${movieId}`).catch((err) => console.log(err)));
-      Promise.all(promises)
-        .then((results) => results.map((sub) => sub.data))
-        .then((movies) => {
-          setMovieSubs(movies);
-          setGotMovieSubs(true);
+        .then((games) => {
+          setGameSubs(games);
+          setGotSubs(true);
         })
         .catch((err) => {
           console.log(err);
         });
     }
   };
+
+  // const config = {
+  //   method: 'post',
+  //   url: 'http://localhost:8080/reviews',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   data,
+  // };
+
+  // axios(config)
+  //   .then((response) => {
+  //     console.log(JSON.stringify(response.data));
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //   });
+
+  useEffect(() => {
+    if (user) {
+      getSubs();
+    }
+  }, [gameSubs]);
 
   const handleImageUpload = (e) => {
     const [file] = e.target.files;
@@ -97,28 +120,22 @@ const Post = ({ user, createPost }) => {
 
   return (
     <div>
-      <h1 id="header">Create a post</h1>
-      <div id="post-sub-header"> share your thoughts with the world!</div>
+      <h1 id="header">Create a Review</h1>
+      <div id="post-sub-header"> share your reviews with the world!</div>
       <div className="create-post-form">
         <select
           className="choose-show"
-          onChange={(e) => setShow(e.target.value)}
+          onChange={(e) => setGame(e.target.value)}
         >
           <option className="choose-show" value="none">
-            What do you want to talk about?
+            What game do you want to review?
           </option>
-          {movieSubs.map((sub, i) => (
-            <option key={sub + i} value={sub.id}>
-              {sub.name || sub.title}
-            </option>
-          ))}
-          {subs.map((sub, i) => (
+          {gameSubs.map((sub, i) => (
             <option key={sub + i} value={sub.id}>
               {sub.name || sub.title}
             </option>
           ))}
           {getSubs()}
-          {getMovieSubs()}
         </select>
         <div className="title-container">
           <input
@@ -162,5 +179,4 @@ const Post = ({ user, createPost }) => {
     </div>
   );
 };
-
-export default Post;
+export default Review;

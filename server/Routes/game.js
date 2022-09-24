@@ -102,8 +102,9 @@ game.get('/byname/:name', (req, res) => {
       const theTruth = Promise.resolve(Promise.all(promiseArr));
       return theTruth
         .then((data) => {
-          // console.log('theTruths data\n', data);
-          res.sendStatus(200);
+          const games = data.flat();
+          // console.log(games);
+          res.status(200).send(games);
         })
         .catch((err) => {
           console.error('error on request\n', err);
@@ -134,7 +135,20 @@ game.post('/genre', (req, res) => {
       for (let i = 0; i < 10; i += 1) {
         top10Games.push(response.data[keys[i]]);
       }
-      res.status(200).send(JSON.stringify(top10Games));
+
+      Promise.all(top10Games.map((game) => {
+        const getGameInfo = {
+          method: 'get',
+          url: `https://store.steampowered.com/api/appdetails?appids=${game.appid}`,
+          headers: {},
+        };
+        return axios(getGameInfo);
+      }))
+        .then((gamesInfo) => res.status(201).send(JSON.stringify(gamesInfo.map((gameInfo, i) => gameInfo.data[top10Games[i].appid].data))))
+        .catch((err) => {
+          console.log(err);
+          res.status(404).send('Error in the request to the steam api');
+        });
     })
     .catch((err) => {
       console.log(err);
@@ -245,6 +259,9 @@ game.post('/updates', (req, res) => {
 game.get('/subscribe', (req, res) => {
   Users.findOne({ id: req.cookies.ShowNTellId })
     .then((userInfo) => {
+      if (userInfo.gameSubscriptions.length === 0) {
+        res.status(404).send('error on the server');
+      }
       Promise.all(userInfo.gameSubscriptions.map((game) => Games.findOne({ id: game })))
         .then((results) => {
           const g = [];
@@ -256,6 +273,52 @@ game.get('/subscribe', (req, res) => {
           res.status(404).send('error on the server');
         });
     });
+});
+
+// subscribing a user to a game by it's id
+game.put('/subscribe/:id', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then(({ gameSubscriptions }) => {
+      gameSubscriptions.push(req.params.id);
+      return Users.updateOne({ id: req.cookies.ShowNTellId }, { gameSubscriptions });
+    })
+    .then(() => res.status(201).send('successfully subscribed!'))
+    .catch((err) => {
+      console.error('couldn\'t subscribe', err);
+      res.sendStatus(404);
+    });
+});
+
+// unsubscribe a videogame for a user by game id
+game.put('/unsubscribe', (req, res) => {
+  console.log(req.body);
+  const { game, subscriptions } = req.body;
+  const subscriptionLocation = subscriptions.indexOf(game.toString());
+  const newSubs = subscriptions;
+  newSubs.splice(subscriptionLocation, 1);
+  console.log(subscriptions);
+  console.log('new', newSubs);
+});
+
+game.get('/subscribed/:id', (req, res) => {
+  Games.findOne({ id: req.params.id })
+    .then((game) => {
+      res.send(game).status(200);
+    })
+    .catch();
+});
+game.post('/reviews', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then((data) => {
+      const userReviews = data.user_reviews;
+      Users.updateOne(
+        { id: req.cookies.ShowNTellId },
+        {
+          $push: { user_reviews: req.body.review },
+        },
+      ).then((data) => res.status(201).send(JSON.stringify(data)));
+    })
+    .catch((err) => console.log(err));
 });
 
 module.exports = game;

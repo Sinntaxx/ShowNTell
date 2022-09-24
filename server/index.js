@@ -23,7 +23,7 @@ const { ExpressPeerServer } = require('peer');
 const { game } = require('./Routes/index.js');
 const { GoogleStrategy } = require('./oauth/passport');
 
-const { Users, Posts, Shows, Replys, Movies } = require('./db/schema.js');
+const { Users, Posts, Shows, Replys, Movies, Games } = require('./db/schema.js');
 
 const app = express();
 
@@ -75,8 +75,7 @@ app.get(
   passport.authenticate(
     'google',
     { scope: ['https://www.googleapis.com/auth/plus.login'] },
-    (req, res) => {
-    },
+    (req, res) => {},
   ),
 );
 
@@ -137,7 +136,10 @@ app.get('/posts', (req, res) => {
 // ?? //
 
 app.get('/getrectv/:id', (req, res) => {
-  axios.get(`https://api.themoviedb.org/3/tv/${req.params.id}/recommendations?api_key=${movieDbKey}&language=en-US&page=1`)
+  axios
+    .get(
+      `https://api.themoviedb.org/3/tv/${req.params.id}/recommendations?api_key=${movieDbKey}&language=en-US&page=1`,
+    )
     .then((response) => {
       res.send(response.data);
     })
@@ -145,7 +147,10 @@ app.get('/getrectv/:id', (req, res) => {
 });
 
 app.get('/getrecmovie/:id', (req, res) => {
-  axios.get(`https://api.themoviedb.org/3/movie/${req.params.id}/recommendations?api_key=${movieDbKey}&language=en-US&page=1`)
+  axios
+    .get(
+      `https://api.themoviedb.org/3/movie/${req.params.id}/recommendations?api_key=${movieDbKey}&language=en-US&page=1`,
+    )
     .then((response) => {
       res.send(response.data);
     })
@@ -153,7 +158,10 @@ app.get('/getrecmovie/:id', (req, res) => {
 });
 
 app.get('/gettvdata/:name', (req, res) => {
-  axios.get(`https://api.themoviedb.org/3/search/tv?api_key=${movieDbKey}&query=${req.params.name}`)
+  axios
+    .get(
+      `https://api.themoviedb.org/3/search/tv?api_key=${movieDbKey}&query=${req.params.name}`,
+    )
     .then((response) => {
       const subName = response.data.results[0].name;
       const subID = response.data.results[0].id;
@@ -170,7 +178,10 @@ app.get('/gettvdata/:name', (req, res) => {
 });
 
 app.get('/getmoviedata/:name', (req, res) => {
-  axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${movieDbKey}&query=${req.params.name}`)
+  axios
+    .get(
+      `https://api.themoviedb.org/3/search/movie?api_key=${movieDbKey}&query=${req.params.name}`,
+    )
     .then((response) => {
       const subName = response.data.results[0].title;
       const subID = response.data.results[0].id;
@@ -303,7 +314,9 @@ app.get('/search/movie/:query', (req, res) => {
   return axios(url)
     .then(({ data }) => data)
     .then((data) => res.status(200).send(data))
-    .catch((err) => { console.log(err); });
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 app.get('/show/:id', (req, res) => {
@@ -333,7 +346,9 @@ app.get('/movie/:id', (req, res) => {
       if (record.length > 0) {
         return record[0];
       }
-      return axios(`https://api.themoviedb.org/3/movie/${req.params.id}?api_key=${movieKey}&language=en-US`)
+      return axios(
+        `https://api.themoviedb.org/3/movie/${req.params.id}?api_key=${movieKey}&language=en-US`,
+      )
         .then(({ data }) => Movies.create({
           id: data.id,
           title: data.title,
@@ -411,12 +426,12 @@ app.put('/unsubscribe', (req, res) => {
   Users.updateOne(
     { id: req.body.userId },
     { $pull: { subscriptions: req.body.showId } },
-  ).then(() => {
-    Users.findOne({ id: req.body.userId })
-      .then((data) => {
+  )
+    .then(() => {
+      Users.findOne({ id: req.body.userId }).then((data) => {
         res.send(data);
       });
-  })
+    })
     .catch((err) => console.log(err));
 });
 
@@ -424,12 +439,12 @@ app.put('/unsubscribeMovie', (req, res) => {
   Users.updateOne(
     { id: req.body.userId },
     { $pull: { movieSubscriptions: req.body.movieId } },
-  ).then(() => {
-    Users.findOne({ id: req.body.userId })
-      .then((data) => {
+  )
+    .then(() => {
+      Users.findOne({ id: req.body.userId }).then((data) => {
         res.send(data);
       });
-  })
+    })
     .catch((err) => console.log(err));
 });
 
@@ -452,7 +467,9 @@ app.post('/upload', async (req, res) => {
   // console.log(req.body, 428);
   try {
     const pic = req.body.img;
-    const uploadedRes = await cloudinary.uploader.upload(pic, { upload_preset: 'showntell' });
+    const uploadedRes = await cloudinary.uploader.upload(pic, {
+      upload_preset: 'showntell',
+    });
     // console.log(uploadedRes, 'hello');
 
     res.status(201).send(uploadedRes.public_id);
@@ -462,7 +479,8 @@ app.post('/upload', async (req, res) => {
 });
 
 app.post('/posts', (req, res) => {
-  const { title, content, poster, show, name } = req.body;
+  console.log(req.body, 'texttttttttt');
+  const { title, content, poster, topic_id, name, type } = req.body;
   const { text, pic } = content;
   Users.findOne({ id: req.cookies.ShowNTellId }).then((data) => {
     userInfo = data;
@@ -471,30 +489,50 @@ app.post('/posts', (req, res) => {
       content: { text, pic },
       user: poster,
       name,
-      topic_id: show,
+      topic_id,
       comments: {},
       createdAt: new Date(),
       liked: false,
       likedCount: 0,
+      type,
     })
       .then((post) => {
         Users.findById(poster)
           .then((user) => {
-            userInfo.posts = [...user.posts, post._id];
-            Users.updateOne(
-              { _id: poster },
-              { posts: [...user.posts, post._id] },
-            ).catch();
+            if (post.type === 'game') {
+              userInfo.user_reviews = [...user.user_reviews, post._id];
+              Users.updateOne(
+                { _id: poster },
+                { user_reviews: [...user.user_reviews, post._id] },
+              ).catch();
+            } else {
+              userInfo.posts = [...user.posts, post._id];
+              Users.updateOne(
+                { _id: poster },
+                { posts: [...user.posts, post._id] },
+              ).catch();
+            }
           })
           .then(() => {
-            Shows.findOne({ id: show })
-              .then((record) => {
-                Shows.updateOne(
-                  { id: show },
-                  { posts: [...record.posts, post._id] },
-                ).catch();
-              })
-              .catch();
+            if (post.type === 'game') {
+              Games.findOne({ id: topic_id })
+                .then((record) => {
+                  Games.updateOne(
+                    { id: topic_id },
+                    { user_reviews: [...record.user_reviews, post._id] },
+                  ).catch();
+                })
+                .catch();
+            } else {
+              Shows.findOne({ id: topic_id })
+                .then((record) => {
+                  Shows.updateOne(
+                    { id: topic_id },
+                    { posts: [...record.posts, post._id] },
+                  ).catch();
+                })
+                .catch();
+            }
           })
           .catch();
       })
@@ -568,15 +606,22 @@ app.delete('/notifs/:index', (req, res) => {
         replacementNotif.push(userInfo.notifs[i]);
       }
     }
-    Users.update(
-      { id: userInfo.id },
-      { notifs: replacementNotif },
-    ).then((data) => res.json(data));
+    Users.update({ id: userInfo.id }, { notifs: replacementNotif }).then(
+      (data) => res.json(data),
+    );
   });
 });
 
 app.get('/postShow/:id', (req, res) => {
   Shows.findOne({ id: req.params.id })
+    .then((data) => res.json(data))
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(400);
+    });
+});
+app.get('/postGame/:id', (req, res) => {
+  Games.findOne({ id: req.params.id })
     .then((data) => res.json(data))
     .catch((err) => {
       console.error(err);
@@ -699,15 +744,13 @@ app.put('/follow', (req, res) => {
   Users.findOne({ _id: followed })
     .then((data) => {
       // update user that will follow
-      Users.updateOne(
-        { _id: follower },
-        { $push: { following: data } },
-      ).then(() => {
-        Users.findOne({ _id: follower })
-          .then((data) => {
+      Users.updateOne({ _id: follower }, { $push: { following: data } }).then(
+        () => {
+          Users.findOne({ _id: follower }).then((data) => {
             res.send(data);
           });
-      });
+        },
+      );
     })
     .catch((err) => res.send(err));
 });
@@ -718,10 +761,9 @@ app.put('/unfollow', (req, res) => {
     { _id: follower },
     { $pull: { following: { id: followed } } }, // not working with _id for some reason
   ).then(() => {
-    Users.findOne({ _id: follower })
-      .then((data) => {
-        res.send(data);
-      });
+    Users.findOne({ _id: follower }).then((data) => {
+      res.send(data);
+    });
   });
 });
 
@@ -739,11 +781,18 @@ app.get('/users/:id/', (req, res) => {
     });
 });
 
+// app.get('/users/posts/', (req, res) => {
+//   Users.findOne({ id: req.params.id })
+//     .then((data) => res.json(data))
+//     .catch((err) => res.send(err));
+// });
+
 // Randolph's Tight Back End API Calls
 
 // 1a. TV show cast.
 app.get('/cast/:id', (req, res) => {
-  axios.get(`http://api.tvmaze.com/shows/${req.params.id}/cast`)
+  axios
+    .get(`http://api.tvmaze.com/shows/${req.params.id}/cast`)
     .then((response) => {
       res.send(response.data);
     })
@@ -754,7 +803,8 @@ app.get('/cast/:id', (req, res) => {
 
 // 1b. TV show crew.
 app.get('/crew/:id', (req, res) => {
-  axios.get(`http://api.tvmaze.com/shows/${req.params.id}/crew`)
+  axios
+    .get(`http://api.tvmaze.com/shows/${req.params.id}/crew`)
     .then((response) => {
       res.send(response.data);
     })
@@ -765,7 +815,10 @@ app.get('/crew/:id', (req, res) => {
 
 // 2. Movie cast and crew.
 app.get('/movieData/:id', (req, res) => {
-  axios.get(`https://api.themoviedb.org/3/movie/${req.params.id}/credits?api_key=${movieKey}&language=en-US&page=1`)
+  axios
+    .get(
+      `https://api.themoviedb.org/3/movie/${req.params.id}/credits?api_key=${movieKey}&language=en-US&page=1`,
+    )
     .then((response) => {
       res.send(response.data);
     })

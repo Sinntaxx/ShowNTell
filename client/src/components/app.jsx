@@ -25,6 +25,7 @@ import MovieFeed from './Subscriptions/MovieFeed.jsx';
 import FriendList from './FriendList/friendList.jsx';
 import VideoGameList from './VideoGameList/VideoGameList.jsx';
 import Games from './GameRecommended/Games.jsx';
+import Review from './Review/Review.jsx';
 
 const App = () => {
   const [posts, setPosts] = useState();
@@ -38,6 +39,7 @@ const App = () => {
   const [userClicked, setUsersClicked] = useState(false);
   const [test, setTest] = useState(false);
   const [users, setUsers] = useState([]);
+  const [recommendedGames, setRecGames] = useState([]);
 
   const changeView = (newView) => {
     setView(newView);
@@ -47,9 +49,10 @@ const App = () => {
     if (!user) {
       axios
         .get('/user')
-        .then(({ data }) => setUser(data))
-        .then(() => {
+        .then(({ data }) => {
+          setUser(data);
         })
+        .then(() => {})
         .then(() => setTest(true))
         .catch();
     } else if (test) {
@@ -60,8 +63,8 @@ const App = () => {
 
   const getPosts = () => {
     if (!posts && user) {
-    // if (!userClicked) {
-    //   executed = !executed;
+      // if (!userClicked) {
+      //   executed = !executed;
       axios
         .get('/posts')
         .then(({ data }) => {
@@ -75,7 +78,8 @@ const App = () => {
   const getUsers = () => {
     const buildFollowers = [];
     if (!users.length) {
-      axios.get('/users')
+      axios
+        .get('/users')
         .then((result) => {
           const people = result.data;
           people.forEach((person) => {
@@ -104,29 +108,47 @@ const App = () => {
   };
 
   const createPost = (post) => {
-    axios
-      .post('/posts', post)
-      .then(() => setView('home'))
-      .then(() => axios.get('/user').then(({ data }) => setUser(data)))
-      .then(() => axios.get('/posts').then(({ data }) => setPosts(data)))
-      .catch();
+    console.log(post);
+    if (post.type === 'game') {
+      axios
+        .post('/posts', post)
+        .then(() => setView('home'))
+        .then(() => axios.get('/user').then(({ data }) => setUser(data)))
+        .then(() => axios.get('/posts').then(({ data }) => setPosts(data)))
+        .catch();
+    } else {
+      axios
+        .post('/posts', post)
+        .then(() => setView('home'))
+        .then(() => axios.get('/user').then(({ data }) => setUser(data)))
+        .then(() => axios.get('/posts').then(({ data }) => setPosts(data)))
+        .catch();
+    }
   };
 
   const searchShows = () => {
     // Telling the server to run this API call with the /search/value passed in.
-    axios.get(`/search/${search}`).then(({ data }) => {
-      setView('Shows');
-      setSearch('');
-      // Sets searchedShows to [] of being mapped over in searchFeed.
-      setSearchedShows(data);
-    }).catch();
+    axios
+      .get(`/search/${search}`)
+      .then(({ data }) => {
+        setView('Shows');
+        setSearch('');
+        // Sets searchedShows to [] of being mapped over in searchFeed.
+        setSearchedShows(data);
+      })
+      .catch();
   };
   const searchMovies = () => {
-    axios.get(`/search/movies/${search}`).then(({ data }) => {
-      setView('Movies');
-      setSearch('');
-      setSearchedMovies(data.results);
-    }).catch((err) => { console.log(err); });
+    axios
+      .get(`/search/movies/${search}`)
+      .then(({ data }) => {
+        setView('Movies');
+        setSearch('');
+        setSearchedMovies(data.results);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     if (search === 'Space Jam' || search === 'come on and JAM!') {
       console.log('heyya from redirect');
       window.location.assign('https://www.spacejam.com/1996/');
@@ -152,24 +174,34 @@ const App = () => {
   };
 
   const addShow = (show) => {
-    axios.get(`/show/${show.id}`)
-      .then(({ data }) => { setView('showFeed'); setShowId(data.id); })
+    axios
+      .get(`/show/${show.id}`)
+      .then(({ data }) => {
+        setView('showFeed');
+        setShowId(data.id);
+      })
       .catch();
   };
   const addMovie = (movie) => {
-    axios.get(`/movie/${movie.id}`)
-      .then(({ data }) => { setView('movieFeed'); setMovieId(data.id); })
+    axios
+      .get(`/movie/${movie.id}`)
+      .then(({ data }) => {
+        setView('movieFeed');
+        setMovieId(data.id);
+      })
       .catch();
   };
 
   const subscribe = (showId) => {
-    axios.put(`/subscribe/${showId}`)
+    axios
+      .put(`/subscribe/${showId}`)
       .then(() => axios.get('/user').then(({ data }) => setUser(data)))
       .catch();
   };
   const subscribeMovie = (movieId) => {
     // make a new endpoint in index.js for subscriptions, line 287
-    axios.put(`/subscribeMovie/${movieId}`)
+    axios
+      .put(`/subscribeMovie/${movieId}`)
       .then(() => axios.get('/user').then(({ data }) => setUser(data)))
       .catch();
   };
@@ -185,25 +217,67 @@ const App = () => {
   const viewSwitcher = (inputView) => {
     setView(inputView);
   };
-    // call to back end to delete show from database
+  // call to back end to delete show from database
   const deleteShow = (show) => {
-    axios.put('/unsubscribe', { userId: user.id, showId: `${show}` })
-      .then((data) => { console.log(data.data); setUser(data.data); })
+    axios
+      .put('/unsubscribe', { userId: user.id, showId: `${show}` })
+      .then((data) => {
+        console.log(data.data);
+        setUser(data.data);
+      })
       .catch((err) => console.log(err));
   };
-    // call to back end to delete movie from database
+  // call to back end to delete movie from database
   const deleteMovie = (movie) => {
-    axios.put('/unsubscribeMovie', { userId: user.id, movieId: `${movie}` })
-      .then((data) => { console.log(data.data); setUser(data.data); })
+    axios
+      .put('/unsubscribeMovie', { userId: user.id, movieId: `${movie}` })
+      .then((data) => {
+        console.log(data.data);
+        setUser(data.data);
+      })
       .catch((err) => console.log(err));
+  };
+
+  // COME BACK FOR THIS
+  const getGames = (genre) => {
+    const data = JSON.stringify({
+      genre,
+    });
+
+    const config = {
+      method: 'post',
+      url: 'http://localhost:8000/game/genre',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data,
+    };
+
+    axios(config)
+      .then((response) => {
+        setRecGames(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const getView = () => {
     if (view === 'homePage') {
       return <HomePage />;
     }
+    if (view === 'review') {
+      return <Review user={user} createPost={createPost} />;
+    }
     if (view === 'sub') {
-      return <Sub user={user} setView={setView} deleteMovie={deleteMovie} deleteShow={deleteShow} />;
+      return (
+        <Sub
+          user={user}
+          setView={setView}
+          deleteMovie={deleteMovie}
+          deleteShow={deleteShow}
+        />
+      );
     }
     if (view === 'recommendedBoth') {
       return <RecommendedBoth user={user} />;
@@ -212,13 +286,18 @@ const App = () => {
       return <Post user={user} createPost={createPost} />;
     }
     if (view === 'home') {
-      return <HomeFeed handleUserClick={handleUserClick} user={user} setUser={setUser} posts={posts} setPosts={setPosts} />;
+      return <HomeFeed handleUserClick={handleUserClick} user={user} setUser={setUser} posts={posts} setPosts={setPosts} getGames={getGames} />;
     }
     if (view === 'DMs') {
       return <DMs user={user} setUser={setUser} />;
     }
     if (view === 'gameNotifs') {
-      return <meta httpEquiv="Refresh" content={`0; url='https://telegram.me/GameAndWatchBot?start=${user.id}'`} />;
+      return (
+        <meta
+          httpEquiv="Refresh"
+          content={`0; url='https://telegram.me/GameAndWatchBot?start=${user.id}'`}
+        />
+      );
     }
     if (view === 'notifs') {
       return <Notifs user={user} setUser={setUser} />;
@@ -244,43 +323,53 @@ const App = () => {
       return <FriendList user={user} users={users} setUser={setUser} />;
     }
     if (view === 'showFeed') {
-      return <ShowFeed showId={showId} subscribe={subscribe} viewSwitcher={viewSwitcher} />;
+      return (
+        <ShowFeed
+          showId={showId}
+          subscribe={subscribe}
+          viewSwitcher={viewSwitcher}
+        />
+      );
     }
     if (view === 'movieFeed') {
-      return <MovieFeed movieId={movieId} subscribe={subscribeMovie} viewSwitcher={viewSwitcher} />;
+      return (
+        <MovieFeed
+          movieId={movieId}
+          subscribe={subscribeMovie}
+          viewSwitcher={viewSwitcher}
+        />
+      );
     }
     if (view === 'videoGames') {
-      return <VideoGameList viewSwitcher={viewSwitcher} />;
+      return <VideoGameList viewSwitcher={viewSwitcher} user={user} />;
     }
     // Should show the games view
     if (view === 'recGames') {
-      return <Games />;
+      return <Games recGames={recommendedGames} />;
     }
   };
 
   return (
     <div>
-      {user
-        ? (
-          <Nav
-            user={user}
-            search={search}
-            onClick={changeView}
-            logout={logout}
-            setSearch={setSearch}
-            onSearch={searchShows}
-            onSearchTwo={searchMovies}
-          />
-        )
-        : (
-          <a
-            className="login-button"
-            href="/auth/google"
-            // onClick={() => axios.get('/auth/google').then(({ data }) => console.log(data))}
-          >
-            LOGIN WITH GOOGLE
-          </a>
-        )}
+      {user ? (
+        <Nav
+          user={user}
+          search={search}
+          onClick={changeView}
+          logout={logout}
+          setSearch={setSearch}
+          onSearch={searchShows}
+          onSearchTwo={searchMovies}
+        />
+      ) : (
+        <a
+          className="login-button"
+          href="/auth/google"
+          // onClick={() => axios.get('/auth/google').then(({ data }) => console.log(data))}
+        >
+          LOGIN WITH GOOGLE
+        </a>
+      )}
       {getUser()}
       {getPosts()}
       {getUsers()}

@@ -69,6 +69,7 @@ const gameSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  name: String,
   description: String,
   short_desc: String,
   about: String,

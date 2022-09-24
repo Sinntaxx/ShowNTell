@@ -149,7 +149,6 @@ game.post('/newUser', (req, res) => {
     // This is the user token to associate the user in the database with the user on telegram
     const userToken = message.text.split(' ')[1];
     const chatId = message.chat.id;
-    console.log('arrived');
     axios
       .post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         chat_id: chatId,
@@ -159,7 +158,6 @@ game.post('/newUser', (req, res) => {
         return Users.findOneAndUpdate({ id: userToken }, { chatId, notifs: true });
       })
       .then((result) => {
-        console.log(result);
         res.sendStatus(200);
       })
       .catch((err) => {
@@ -206,7 +204,6 @@ game.post('/updates', (req, res) => {
       })
       .then((games) => {
         games.forEach((game, i) => {
-          console.log(allPatchNotes[i].data.appnews.newsitems);
           if (
             allPatchNotes[i].data.appnews.newsitems.length
             && ((!game.most_recent_update)

@@ -102,8 +102,9 @@ game.get('/byname/:name', (req, res) => {
       const theTruth = Promise.resolve(Promise.all(promiseArr));
       return theTruth
         .then((data) => {
-          // console.log('theTruths data\n', data);
-          res.sendStatus(200);
+          const games = data.flat();
+          // console.log(games);
+          res.status(200).send(games);
         })
         .catch((err) => {
           console.error('error on request\n', err);
@@ -275,6 +276,31 @@ game.get('/subscribe', (req, res) => {
           res.status(404).send('error on the server');
         });
     });
+});
+
+// subscribing a user to a game by it's id
+game.put('/subscribe/:id', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then(({ gameSubscriptions }) => {
+      gameSubscriptions.push(req.params.id);
+      return Users.updateOne({ id: req.cookies.ShowNTellId }, { gameSubscriptions });
+    })
+    .then(() => res.status(201).send('successfully subscribed!'))
+    .catch((err) => {
+      console.error('couldn\'t subscribe', err);
+      res.sendStatus(404);
+    });
+});
+
+// unsubscribe a videogame for a user by game id
+game.put('/unsubscribe', (req, res) => {
+  console.log(req.body);
+  const { game, subscriptions } = req.body;
+  const subscriptionLocation = subscriptions.indexOf(game.toString());
+  const newSubs = subscriptions;
+  newSubs.splice(subscriptionLocation, 1);
+  console.log(subscriptions);
+  console.log('new', newSubs);
 });
 
 module.exports = game;

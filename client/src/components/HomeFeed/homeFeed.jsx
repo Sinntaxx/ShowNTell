@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import FeedItem from './feedItem.jsx';
 import './homefeed.css';
+import Review from '../Review/Review.jsx';
 
 const HomeFeed = ({ posts, handleUserClick, user, setPosts, setUser }) => (
   <div>
@@ -18,6 +19,7 @@ const HomeFeed = ({ posts, handleUserClick, user, setPosts, setUser }) => (
           />
         ))
         : null}
+      <Review />
     </div>
   </div>
 );

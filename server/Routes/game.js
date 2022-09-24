@@ -104,7 +104,7 @@ game.get('/byname/:name', (req, res) => {
       return theTruth
         .then((data) => {
           const games = data.flat();
-          console.log(games);
+          // console.log(games);
           res.status(200).send(games);
         })
         .catch((err) => {
@@ -275,6 +275,17 @@ game.put('/subscribe/:id', (req, res) => {
       console.error('couldn\'t subscribe', err);
       res.sendStatus(404);
     });
+});
+
+// unsubscribe a videogame for a user by game id
+game.put('/unsubscribe', (req, res) => {
+  console.log(req.body);
+  const { game, subscriptions } = req.body;
+  const subscriptionLocation = subscriptions.indexOf(game.toString());
+  const newSubs = subscriptions;
+  newSubs.splice(subscriptionLocation, 1);
+  console.log(subscriptions);
+  console.log('new', newSubs);
 });
 
 module.exports = game;

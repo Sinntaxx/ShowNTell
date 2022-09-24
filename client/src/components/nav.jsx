@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaHome, FaStar, FaPen, FaBell, FaEnvelope, FaSearch, FaDoorOpen, FaLinkedin, FaUnity, FaHandshake, FaFingerprint, FaSteamSymbol, FaFantasyFlightGames } from 'react-icons/fa';
+import { FaHome, FaStar, FaPen, FaBell, FaEnvelope, FaSearch, FaDoorOpen, FaNewspaper, FaLinkedin, FaUnity, FaHandshake, FaFingerprint, FaSteamSymbol, FaFantasyFlightGames } from 'react-icons/fa';
 import logo from './HomePage/img/logo1.png';
 // import Notifications from './HomePage/Notifications.jsx';
 
@@ -77,7 +77,7 @@ const Nav = ({
         title="create a review"
       >
         {' '}
-        <FaPen />
+        <FaNewspaper />
         {' '}
       </li>
       <li

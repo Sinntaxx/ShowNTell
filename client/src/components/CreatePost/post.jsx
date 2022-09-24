@@ -25,7 +25,7 @@ const Post = ({ user, createPost }) => {
         createPost({
           title,
           content: { text: content, pic: img },
-          show,
+          topic_id: show,
           poster: user._id,
         });
         setTitle('');
@@ -37,7 +37,7 @@ const Post = ({ user, createPost }) => {
             createPost({
               title,
               content: { text: content, pic: id.data },
-              show,
+              topic_id: show,
               poster: user._id,
             });
           })

@@ -16,10 +16,11 @@ const Review = ({ user, createPost }) => {
   const onClick = () => {
     if (game !== 'none' && title !== '') {
       if (img === null) {
+        console.log(game, 'game.....');
         createPost({
           title,
           content: { text: content, pic: img },
-          topic_id: game.id,
+          topic_id: game,
           type: 'game',
           poster: user._id,
         });
@@ -32,7 +33,7 @@ const Review = ({ user, createPost }) => {
             createPost({
               title,
               content: { text: content, pic: id.data },
-              topic_id: game.id,
+              topic_id: game,
               type: 'game',
               poster: user._id,
             });
@@ -62,10 +63,12 @@ const Review = ({ user, createPost }) => {
       //   })
       //   .catch((err) => console.error(err));
 
-      const promises = user.gameSubscriptions.map((gameId) => axios.get(`/game/subscribed/${user.id}`)
+      const promises = user.gameSubscriptions.map((gameId) => axios.get(`/game/subscribed/${gameId}`)
         .catch((err) => console.log(err)));
       Promise.all(promises)
-        .then((results) => results.map((sub) => console.log(sub)))
+        .then((results) => {
+          return results.map((sub) => sub.data);
+        })
         .then((games) => {
           setGameSubs(games);
           setGotSubs(true);

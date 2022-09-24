@@ -23,7 +23,7 @@ const { ExpressPeerServer } = require('peer');
 const { game } = require('./Routes/index.js');
 const { GoogleStrategy } = require('./oauth/passport');
 
-const { Users, Posts, Shows, Replys, Movies } = require('./db/schema.js');
+const { Users, Posts, Shows, Replys, Movies, Games } = require('./db/schema.js');
 
 const app = express();
 
@@ -120,20 +120,6 @@ app.get('/users', (req, res) => {
       console.error(err);
       res.sendStatus(500);
     });
-});
-app.post('/reviews', (req, res) => {
-  Users.findOne({ id: req.cookies.ShowNTellId })
-    .then((data) => {
-      const userReviews = data.user_reviews;
-      console.log(data, 'im here in /reviews..........');
-      Users.updateOne(
-        { id: req.cookies.ShowNTellId },
-        {
-          $push: { user_reviews: req.body.review },
-        },
-      ).then((data) => res.status(201).send(JSON.stringify(data)));
-    })
-    .catch((err) => console.log(err));
 });
 
 app.get('/posts', (req, res) => {
@@ -493,7 +479,8 @@ app.post('/upload', async (req, res) => {
 });
 
 app.post('/posts', (req, res) => {
-  const { title, content, poster, show, name } = req.body;
+  console.log(req.body, 'texttttttttt');
+  const { title, content, poster, topic_id, name, type } = req.body;
   const { text, pic } = content;
   Users.findOne({ id: req.cookies.ShowNTellId }).then((data) => {
     userInfo = data;
@@ -502,30 +489,50 @@ app.post('/posts', (req, res) => {
       content: { text, pic },
       user: poster,
       name,
-      topic_id: show,
+      topic_id,
       comments: {},
       createdAt: new Date(),
       liked: false,
       likedCount: 0,
+      type,
     })
       .then((post) => {
         Users.findById(poster)
           .then((user) => {
-            userInfo.posts = [...user.posts, post._id];
-            Users.updateOne(
-              { _id: poster },
-              { posts: [...user.posts, post._id] },
-            ).catch();
+            if (post.type === 'game') {
+              userInfo.user_reviews = [...user.user_reviews, post._id];
+              Users.updateOne(
+                { _id: poster },
+                { user_reviews: [...user.user_reviews, post._id] },
+              ).catch();
+            } else {
+              userInfo.posts = [...user.posts, post._id];
+              Users.updateOne(
+                { _id: poster },
+                { posts: [...user.posts, post._id] },
+              ).catch();
+            }
           })
           .then(() => {
-            Shows.findOne({ id: show })
-              .then((record) => {
-                Shows.updateOne(
-                  { id: show },
-                  { posts: [...record.posts, post._id] },
-                ).catch();
-              })
-              .catch();
+            if (post.type === 'game') {
+              Games.findOne({ id: topic_id })
+                .then((record) => {
+                  Games.updateOne(
+                    { id: topic_id },
+                    { user_reviews: [...record.user_reviews, post._id] },
+                  ).catch();
+                })
+                .catch();
+            } else {
+              Shows.findOne({ id: topic_id })
+                .then((record) => {
+                  Shows.updateOne(
+                    { id: topic_id },
+                    { posts: [...record.posts, post._id] },
+                  ).catch();
+                })
+                .catch();
+            }
           })
           .catch();
       })
@@ -607,6 +614,14 @@ app.delete('/notifs/:index', (req, res) => {
 
 app.get('/postShow/:id', (req, res) => {
   Shows.findOne({ id: req.params.id })
+    .then((data) => res.json(data))
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(400);
+    });
+});
+app.get('/postGame/:id', (req, res) => {
+  Games.findOne({ id: req.params.id })
     .then((data) => res.json(data))
     .catch((err) => {
       console.error(err);

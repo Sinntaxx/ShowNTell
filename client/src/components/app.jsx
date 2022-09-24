@@ -107,12 +107,22 @@ const App = () => {
   };
 
   const createPost = (post) => {
-    axios
-      .post('/posts', post)
-      .then(() => setView('home'))
-      .then(() => axios.get('/user').then(({ data }) => setUser(data)))
-      .then(() => axios.get('/posts').then(({ data }) => setPosts(data)))
-      .catch();
+    console.log(post);
+    if (post.type === 'game') {
+      axios
+        .post('/posts', post)
+        .then(() => setView('home'))
+        .then(() => axios.get('/user').then(({ data }) => setUser(data)))
+        .then(() => axios.get('/posts').then(({ data }) => setPosts(data)))
+        .catch();
+    } else {
+      axios
+        .post('/posts', post)
+        .then(() => setView('home'))
+        .then(() => axios.get('/user').then(({ data }) => setUser(data)))
+        .then(() => axios.get('/posts').then(({ data }) => setPosts(data)))
+        .catch();
+    }
   };
 
   const searchShows = () => {

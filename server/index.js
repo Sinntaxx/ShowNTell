@@ -95,6 +95,7 @@ app.get(
         res.redirect('/');
         userInfo = data;
       } else {
+        newUser.notifs = false;
         newUser.save().then(() => {
           userInfo = newUser;
           res.redirect('/');
@@ -113,14 +114,22 @@ app.get('/user', (req, res) => {
 
 app.get('/users', (req, res) => {
   Users.find()
-    .then((data) => res.status(200).json(data))
-    .catch();
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(500);
+    });
 });
 
 app.get('/posts', (req, res) => {
   Posts.find()
     .then((posts) => res.send(posts))
-    .catch();
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(400);
+    });
 });
 
 // !! //
@@ -718,9 +727,16 @@ app.put('/unfollow', (req, res) => {
 
 // test changes in users props
 app.get('/users/:id/', (req, res) => {
+  console.log('hi');
   Users.findOne({ id: req.params.id })
-    .then((data) => res.json(data))
-    .catch((err) => res.send(err));
+    .then((data) => {
+      console.log('hi');
+      res.json(data);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.send(err);
+    });
 });
 
 // Randolph's Tight Back End API Calls
@@ -758,14 +774,14 @@ app.get('/movieData/:id', (req, res) => {
     });
 });
 
-// const options = {
-//   key: fs.readFileSync('server/config/cert.key'),
-//   cert: fs.readFileSync('server/config/cert.crt'),
-// };
-// https.createServer(options, app).listen(8080, () => {
-//   console.log('https://localhost:8080');
-// });
-app.listen(8080, () => {
+const options = {
+  key: fs.readFileSync('server/config/cert.key'),
+  cert: fs.readFileSync('server/config/cert.crt'),
+};
+https.createServer(options, app).listen(8080, () => {
+  console.log('https://localhost:8080');
+});
+app.listen(8000, () => {
   // eslint-disable-next-line no-console
-  console.log('http://localhost:8080');
+  console.log('http://localhost:8000');
 });

@@ -261,4 +261,14 @@ game.get('/subscribe', (req, res) => {
     });
 });
 
+game.get('/subscribed/:id', (req, res) => {
+  console.log(req.params);
+  Users.findOne({ id: req.params.id })
+    .then((user) => {
+      console.log(user, 'user sub......');
+      res.send(user.gameSubscriptions).status(200);
+    })
+    .catch();
+});
+
 module.exports = game;

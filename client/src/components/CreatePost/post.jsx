@@ -22,13 +22,24 @@ const Post = ({ user, createPost }) => {
   const onClick = () => {
     if (show !== 'none' && title !== '') {
       if (img === null) {
-        createPost({ title, content: { text: content, pic: img }, show, poster: user._id });
+        createPost({
+          title,
+          content: { text: content, pic: img },
+          show,
+          poster: user._id,
+        });
         setTitle('');
         setContent('');
       } else {
-        axios.post('/upload', { img })
+        axios
+          .post('/upload', { img })
           .then((id) => {
-            createPost({ title, content: { text: content, pic: id.data }, show, poster: user._id });
+            createPost({
+              title,
+              content: { text: content, pic: id.data },
+              show,
+              poster: user._id,
+            });
           })
           .catch();
         setTitle('');
@@ -55,8 +66,7 @@ const Post = ({ user, createPost }) => {
   };
   const getMovieSubs = () => {
     if (!gotMovieSubs) {
-      const promises = user.movieSubscriptions.map((movieId) => axios.get(`/movie/${movieId}`)
-        .catch((err) => console.log(err)));
+      const promises = user.movieSubscriptions.map((movieId) => axios.get(`/movie/${movieId}`).catch((err) => console.log(err)));
       Promise.all(promises)
         .then((results) => results.map((sub) => sub.data))
         .then((movies) => {
@@ -90,39 +100,62 @@ const Post = ({ user, createPost }) => {
       <h1 id="header">Create a post</h1>
       <div id="post-sub-header"> share your thoughts with the world!</div>
       <div className="create-post-form">
-        <select className="choose-show" onChange={(e) => setShow(e.target.value)}>
-          <option className="choose-show" value="none">What do you want to talk about?</option>
+        <select
+          className="choose-show"
+          onChange={(e) => setShow(e.target.value)}
+        >
+          <option className="choose-show" value="none">
+            What do you want to talk about?
+          </option>
           {movieSubs.map((sub, i) => (
             <option key={sub + i} value={sub.id}>
-              {
-          sub.name || sub.title
-          }
+              {sub.name || sub.title}
             </option>
           ))}
           {subs.map((sub, i) => (
             <option key={sub + i} value={sub.id}>
-              {
-          sub.name || sub.title
-          }
+              {sub.name || sub.title}
             </option>
           ))}
           {getSubs()}
           {getMovieSubs()}
         </select>
         <div className="title-container">
-          <input id="post-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="title" />
+          <input
+            id="post-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="title"
+          />
         </div>
         <div className="img-content-container">
           Post a meme!
-          <input type="file" accept="image/*" ref={imgUploader} onChange={handleImageUpload} multiple={false} style={{ display: 'none' }} />
-          <div id="img-content-sub-container" onClick={() => imgUploader.current.click()}>
+          <input
+            type="file"
+            accept="image/*"
+            ref={imgUploader}
+            onChange={handleImageUpload}
+            multiple={false}
+            style={{ display: 'none' }}
+          />
+          <div
+            id="img-content-sub-container"
+            onClick={() => imgUploader.current.click()}
+          >
             <img id="post-img" ref={uploadedImg} alt="" />
           </div>
         </div>
         <div className="content-container">
-          <textarea id="post-text" value={content} onChange={(e) => setContent(e.target.value)} placeholder="what's your message?" />
+          <textarea
+            id="post-text"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="what's your message?"
+          />
         </div>
-        <button id="submit-button" onClick={onClick}>submit post</button>
+        <button id="submit-button" onClick={onClick}>
+          submit post
+        </button>
         <h4 id="error-message">{error}</h4>
       </div>
       <img id="pic" src={pic} alt="pic" />

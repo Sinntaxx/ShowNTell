@@ -135,6 +135,7 @@ app.post('/reviews', (req, res) => {
     })
     .catch((err) => console.log(err));
 });
+
 app.get('/posts', (req, res) => {
   Posts.find()
     .then((posts) => res.send(posts))

@@ -1,10 +1,10 @@
 import React from 'react';
 import Achievements from './Achievements.jsx';
 
-const Leaderboards = () => {
+const Leaderboards = ({ user }) => {
   return (
     <div>
-      <Achievements />
+      <Achievements user={user} />
     </div>
   );
 };

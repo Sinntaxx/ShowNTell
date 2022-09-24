@@ -39,7 +39,6 @@ const FeedItem = ({ post, user = {}, setPosts, setUser }) => {
 
   const [follow, setFollow] = useState(isFollowing());
   const getShow = () => {
-    console.log(currentPost);
     if (!show) {
       if (currentPost.type === 'game') {
         axios(`/postGame/${currentPost.topic_id}`).then(({ data }) => {

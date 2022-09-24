@@ -39,6 +39,7 @@ const App = () => {
   const [userClicked, setUsersClicked] = useState(false);
   const [test, setTest] = useState(false);
   const [users, setUsers] = useState([]);
+  const [recommendedGames, setRecGames] = useState([]);
 
   const changeView = (newView) => {
     setView(newView);
@@ -237,6 +238,30 @@ const App = () => {
       .catch((err) => console.log(err));
   };
 
+  // COME BACK FOR THIS
+  const getGames = (genre) => {
+    const data = JSON.stringify({
+      genre,
+    });
+
+    const config = {
+      method: 'post',
+      url: 'http://localhost:8000/game/genre',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data,
+    };
+
+    axios(config)
+      .then((response) => {
+        setRecGames(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const getView = () => {
     if (view === 'homePage') {
       return <HomePage />;
@@ -261,15 +286,7 @@ const App = () => {
       return <Post user={user} createPost={createPost} />;
     }
     if (view === 'home') {
-      return (
-        <HomeFeed
-          handleUserClick={handleUserClick}
-          user={user}
-          setUser={setUser}
-          posts={posts}
-          setPosts={setPosts}
-        />
-      );
+      return <HomeFeed handleUserClick={handleUserClick} user={user} setUser={setUser} posts={posts} setPosts={setPosts} getGames={getGames} />;
     }
     if (view === 'DMs') {
       return <DMs user={user} setUser={setUser} />;
@@ -328,7 +345,7 @@ const App = () => {
     }
     // Should show the games view
     if (view === 'recGames') {
-      return <Games />;
+      return <Games recGames={recommendedGames} />;
     }
   };
 

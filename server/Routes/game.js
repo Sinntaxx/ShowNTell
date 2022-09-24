@@ -303,4 +303,25 @@ game.put('/unsubscribe', (req, res) => {
   console.log('new', newSubs);
 });
 
+game.get('/subscribed/:id', (req, res) => {
+  Games.findOne({ id: req.params.id })
+    .then((game) => {
+      res.send(game).status(200);
+    })
+    .catch();
+});
+game.post('/reviews', (req, res) => {
+  Users.findOne({ id: req.cookies.ShowNTellId })
+    .then((data) => {
+      const userReviews = data.user_reviews;
+      Users.updateOne(
+        { id: req.cookies.ShowNTellId },
+        {
+          $push: { user_reviews: req.body.review },
+        },
+      ).then((data) => res.status(201).send(JSON.stringify(data)));
+    })
+    .catch((err) => console.log(err));
+});
+
 module.exports = game;

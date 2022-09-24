@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import FeedItem from './feedItem.jsx';
 import './homefeed.css';
+import Review from '../Review/Review.jsx';
 
 const HomeFeed = ({ posts, handleUserClick, user, setPosts, setUser, getGames }) => {
   useEffect(() => {

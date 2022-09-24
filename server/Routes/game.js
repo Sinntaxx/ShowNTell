@@ -10,7 +10,6 @@ const game = express.Router();
 const saveGame = async (game) => {
   // game is formatted from steam store api for db
   const dbGame = {
-    name: game.name,
     id: game.steam_appid,
     description: game.detailed_description,
     short_desc: game.short_description,
@@ -103,9 +102,8 @@ game.get('/byname/:name', (req, res) => {
       const theTruth = Promise.resolve(Promise.all(promiseArr));
       return theTruth
         .then((data) => {
-          const games = data.flat();
-          console.log(games);
-          res.status(200).send(games);
+          // console.log('theTruths data\n', data);
+          res.sendStatus(200);
         })
         .catch((err) => {
           console.error('error on request\n', err);
@@ -137,15 +135,14 @@ game.post('/genre', (req, res) => {
         top10Games.push(response.data[keys[i]]);
       }
 
-      const methods = top10Games.map((game) => {
+      Promise.all(top10Games.map((game) => {
         const getGameInfo = {
           method: 'get',
           url: `http://store.steampowered.com/api/appdetails?appids=${game.appid}`,
           headers: {},
         };
-        return getGameInfo;
-      });
-      axios.all(methods.map((method) => axios(method)))
+        return axios(getGameInfo);
+      }))
         .then((gamesInfo) => res.status(201).send(JSON.stringify(gamesInfo.map((gameInfo, i) => gameInfo.data[top10Games[i].appid].data))))
         .catch((err) => {
           console.log(err);
@@ -277,20 +274,6 @@ game.get('/subscribe', (req, res) => {
           console.log(err);
           res.status(404).send('error on the server');
         });
-    });
-});
-
-// subscribing a user to a game by it's id
-game.put('/subscribe/:id', (req, res) => {
-  Users.findOne({ id: req.cookies.ShowNTellId })
-    .then(({ gameSubscriptions }) => {
-      gameSubscriptions.push(req.params.id);
-      return Users.updateOne({ id: req.cookies.ShowNTellId }, { gameSubscriptions });
-    })
-    .then(() => res.status(201).send('successfully subscribed!'))
-    .catch((err) => {
-      console.error('couldn\'t subscribe', err);
-      res.sendStatus(404);
     });
 });
 

@@ -19,7 +19,6 @@ const HomeFeed = ({ posts, handleUserClick, user, setPosts, setUser }) => (
           />
         ))
         : null}
-      {/* <Review /> */}
     </div>
   </div>
 );

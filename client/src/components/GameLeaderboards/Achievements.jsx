@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListSubheader from '@mui/material/ListSubheader';
 
-const achiev = {
-  name: 'Welcome home...',
-  desc: 'Reach the Estate',
-  imgLocked: 'https://www.achievementstats.com/images/icons/locked/152696.jpg',
-  imgUnlocked: 'https://www.achievementstats.com/images/icons/unlocked/152696.jpg',
-};
+import AchievementEntry from './AchievementEntry.jsx';
 
 const Achievements = () => {
   return (
@@ -20,6 +12,7 @@ const Achievements = () => {
         width: '100%',
         maxWidth: 360,
         maxHeight: 360,
+        overflow: 'auto',
         bgcolor: '#212121',
       }}
       subheader={(
@@ -30,24 +23,15 @@ const Achievements = () => {
         >
           Achievements
         </ListSubheader>
-)}
+      )}
     >
-
-      <ListItem alignItems="center">
-        <ListItemIcon>
-          <img alt="" src={achiev.imgLocked} />
-        </ListItemIcon>
-        <ListItemText
-          primary={achiev.name}
-          secondary={achiev.desc}
-          sx={{
-            color: '#5c637b',
-          }}
-          secondaryTypographyProps={{
-            color: '#5c637b',
-          }}
-        />
-      </ListItem>
+      <AchievementEntry achievement={{
+        name: 'Godfrey, First Elden Lord',
+        desc: 'Defeated Godfrey, First Elden Lord',
+        imgLocked: 'https://www.achievementstats.com/images/icons/locked/3740810.jpg',
+        imgUnlocked: 'https://www.achievementstats.com/images/icons/unlocked/3740810.jpg',
+      }}
+      />
     </List>
   );
 };

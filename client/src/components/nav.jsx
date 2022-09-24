@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaHome, FaStar, FaPen, FaBell, FaEnvelope, FaSearch, FaDoorOpen, FaLinkedin, FaUnity, FaHandshake, FaFingerprint, FaSteamSymbol, FaFighterJet } from 'react-icons/fa';
+import { FaHome, FaStar, FaPen, FaBell, FaEnvelope, FaSearch, FaDoorOpen, FaLinkedin, FaUnity, FaHandshake, FaFingerprint, FaSteamSymbol, FaFighterJet, FaTrophy } from 'react-icons/fa';
 import logo from './HomePage/img/logo1.png';
 
 const Nav = ({ user, onClick, logout, search, setSearch, onSearch, onSearchTwo }) => (
@@ -48,14 +48,17 @@ const Nav = ({ user, onClick, logout, search, setSearch, onSearch, onSearchTwo }
         <FaFighterJet />
         {' '}
       </li>
-      <li onClick={() => onClick('recGames')} className="Views" title="recGames">
+      <li onClick={() => onClick('recGames')} className="views" title="recGames">
         <FaSteamSymbol />
+      </li>
+      <li onClick={() => onClick('leaderboards')} className="views" title="leaderboards">
+        <FaTrophy />
       </li>
       <li onClick={() => onClick('friends')} className="views" title="friends">
         <FaHandshake />
         {' '}
       </li>
-      <li onClick={logout} title="log out"><FaDoorOpen /></li>
+      <li onClick={logout} className="views" title="log out"><FaDoorOpen /></li>
       <li>
         {' '}
         <div className="wrap">

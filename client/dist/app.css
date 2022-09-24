@@ -11,7 +11,7 @@
   font-family: 'Poppins', sans-serif;
 }
 
-li {
+.views {
     display: inline;
     color:#5c637b;
     font-size: 28px;

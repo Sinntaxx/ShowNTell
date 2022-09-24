@@ -145,7 +145,7 @@ game.post('/genre', (req, res) => {
 // url to notify webpage that a user has started a chat with the bot: https://${siteUrl}/game/newUser
 game.post('/newUser', (req, res) => {
   const { message } = req.body;
-  if (message.text.split(' ')[0] === '/start') {
+  if (message.text && message.text.split(' ')[0] === '/start') {
     // This is the user token to associate the user in the database with the user on telegram
     const userToken = message.text.split(' ')[1];
     const chatId = message.chat.id;

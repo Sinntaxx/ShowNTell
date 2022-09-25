@@ -3,7 +3,7 @@ import axios from 'axios';
 import VideoGameEntry from './VideoGameEntry.jsx';
 import './videogame.css';
 
-const VideoGameList = ({ user }) => {
+const VideoGameList = ({ user, setUser }) => {
   // const dummyData = ['Elden Ring', 'Dark Souls 2', 'Goat Simulator'];
   const [videoGamesFromDB, setVideoGamesFromDB] = useState([]);
   const [isVideoGameThere, setVideoGameIsThere] = useState(false);
@@ -39,13 +39,14 @@ const VideoGameList = ({ user }) => {
               game="game-name"
               onKeyDown={(e) => e.key === 'Enter' && handleSubmissionClick}
               onChange={handleInputChange}
+              autoComplete="off"
             />
           </label>
         </form>
         <button className="video-game-submit-button" onClick={handleSubmissionClick}>submit</button>
       </div>
       <div>
-        { isVideoGameThere ? videoGamesFromDB.map((game, i) => <VideoGameEntry key={`${game}: ${i}`} game={game} user={user} />) : <h3 className="text">Games will populate here →</h3>}
+        { isVideoGameThere ? videoGamesFromDB.map((game, i) => <VideoGameEntry key={`${game}: ${i}`} game={game} user={user} setUser={setUser} />) : <h3 className="text">Games will populate here →</h3>}
       </div>
     </>
   );

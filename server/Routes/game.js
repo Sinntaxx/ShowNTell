@@ -280,12 +280,23 @@ game.put('/subscribe/:id', (req, res) => {
 // unsubscribe a videogame for a user by game id
 game.put('/unsubscribe', (req, res) => {
   console.log(req.body);
-  const { game, subscriptions } = req.body;
+  const { game, subscriptions, user } = req.body;
   const subscriptionLocation = subscriptions.indexOf(game.toString());
-  const newSubs = subscriptions;
-  newSubs.splice(subscriptionLocation, 1);
+  subscriptions.splice(subscriptionLocation, 1);
   console.log(subscriptions);
-  console.log('new', newSubs);
+  return Users.updateOne({ id: user }, { gameSubscriptions: subscriptions })
+    .then(() => {
+      console.log('we got to the findOne then catch');
+      return Users.findOne({ id: user });
+    })
+    .then((userObj) => {
+      console.log('userObj', userObj);
+      res.send(userObj).status(203);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(500);
+    });
 });
 
 module.exports = game;

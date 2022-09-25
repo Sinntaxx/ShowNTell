@@ -250,7 +250,7 @@ const App = () => {
       return <MovieFeed movieId={movieId} subscribe={subscribeMovie} viewSwitcher={viewSwitcher} />;
     }
     if (view === 'videoGames') {
-      return <VideoGameList viewSwitcher={viewSwitcher} user={user} />;
+      return <VideoGameList viewSwitcher={viewSwitcher} user={user} setUser={setUser} />;
     }
     // Should show the games view
     if (view === 'recGames') {

@@ -3,13 +3,14 @@ import axios from 'axios';
 import VideoGameEntry from './VideoGameEntry.jsx';
 import './videogame.css';
 
-const VideoGameList = ({ user }) => {
+const VideoGameList = ({ user, setUser }) => {
   // const dummyData = ['Elden Ring', 'Dark Souls 2', 'Goat Simulator'];
   const [videoGamesFromDB, setVideoGamesFromDB] = useState([]);
   const [isVideoGameThere, setVideoGameIsThere] = useState(false);
   const [enteredVideoGame, setEnteredVideoGame] = useState('');
 
   const handleSubmissionClick = () => {
+    console.log('we\'re in the handlesubmissionclick');
     axios.get(`/game/byname/${enteredVideoGame}`)
       .then(({ data }) => {
         console.log('data from db', data);
@@ -17,7 +18,7 @@ const VideoGameList = ({ user }) => {
         setVideoGameIsThere(true);
       })
       .catch((err) => {
-        console.error(err);
+        console.error('inside axios catch', err);
       });
   };
 
@@ -30,22 +31,23 @@ const VideoGameList = ({ user }) => {
       <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@700&display=swap" rel="stylesheet" />
       <link href="https://fonts.googleapis.com/css2?family=Work+Sans&display=swap" rel="stylesheet" />
       <div>
-        <form>
-          <label htmlFor="game-name" className="video-game-search-label">
-            Search for a videogame!
-            <input
-              type="text"
-              id="game-name"
-              game="game-name"
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmissionClick}
-              onChange={handleInputChange}
-            />
-          </label>
-        </form>
+
+        <label htmlFor="game-name" className="video-game-search-label">
+          Search for a videogame!
+          <input
+            type="text"
+            id="game-name"
+            game="game-name"
+            onKeyPress={(e) => (e.key === 'Enter' ? handleSubmissionClick() : null)}
+            onChange={handleInputChange}
+            autoComplete="off"
+          />
+        </label>
+
         <button className="video-game-submit-button" onClick={handleSubmissionClick}>submit</button>
       </div>
       <div>
-        { isVideoGameThere ? videoGamesFromDB.map((game, i) => <VideoGameEntry key={`${game}: ${i}`} game={game} user={user} />) : <h3 className="text">Games will populate here →</h3>}
+        { isVideoGameThere ? videoGamesFromDB.map((game, i) => <VideoGameEntry key={`${game}: ${i}`} game={game} user={user} setUser={setUser} enteredVideoGame={enteredVideoGame} />) : <h3 className="text">Games will populate here →</h3>}
       </div>
     </>
   );

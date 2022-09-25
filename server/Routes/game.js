@@ -55,6 +55,26 @@ const saveGame = async (game) => {
   }
 };
 
+// get all users for leaderboards
+game.get('/playerData', (req, res) => {
+  Users.find()
+    .then((users) => {
+      const userLeaderboards = users.map((user) => {
+        return {
+          name: user.name,
+          gameSubscriptions: user.gameSubscriptions,
+          achievements: user.achievements,
+        };
+      });
+
+      res.status(200).send(userLeaderboards);
+    })
+    .catch((err) => {
+      console.error('error on getting users\n', err);
+      res.sendStatus(500);
+    });
+});
+
 // testing saveGame with request, remove later
 game.post('/newgame', (req, res) => {
   const newGame = req.body;

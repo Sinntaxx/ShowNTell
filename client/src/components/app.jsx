@@ -92,7 +92,7 @@ const App = () => {
               });
             }
           });
-          setUsers(buildFollowers);
+          buildFollowers.length !== users.length ? setUsers(buildFollowers) : null;
         })
         .catch((err) => {
           console.error(err);

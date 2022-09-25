@@ -43,7 +43,6 @@ const FeedItem = ({ post, user = {}, setPosts, setUser }) => {
       if (currentPost.type === 'game') {
         axios(`/postGame/${currentPost.topic_id}`).then(({ data }) => {
           setShow(data.name);
-          console.log(data);
         }).catch((err) => {
           console.error(err);
         });

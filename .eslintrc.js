@@ -39,5 +39,6 @@ module.exports = {
     'react/jsx-props-no-spreading': 0,
     'no-nested-ternary': 0,
     'react/no-unknown-property': 0,
+    'no-unused-expressions': 0,
   },
 };

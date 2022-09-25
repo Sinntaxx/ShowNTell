@@ -25,6 +25,7 @@ import MovieFeed from './Subscriptions/MovieFeed.jsx';
 import FriendList from './FriendList/friendList.jsx';
 import VideoGameList from './VideoGameList/VideoGameList.jsx';
 import Games from './GameRecommended/Games.jsx';
+import Leaderboards from './GameLeaderboards/Leaderboards.jsx';
 import Review from './Review/Review.jsx';
 
 const App = () => {
@@ -246,7 +247,7 @@ const App = () => {
 
     const config = {
       method: 'post',
-      url: 'http://localhost:8000/game/genre',
+      url: '/game/genre',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -346,6 +347,9 @@ const App = () => {
     // Should show the games view
     if (view === 'recGames') {
       return <Games recGames={recommendedGames} />;
+    }
+    if (view === 'leaderboards') {
+      return <Leaderboards user={user} />;
     }
   };
 

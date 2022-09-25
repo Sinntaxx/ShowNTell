@@ -108,7 +108,7 @@ const Nav = ({
       </li>
       <li
         onClick={() => onClick('recGames')}
-        className="Views"
+        className="views"
         title="recGames"
       >
         <FaSteamSymbol />
@@ -120,7 +120,7 @@ const Nav = ({
         <FaHandshake />
         {' '}
       </li>
-      <li onClick={logout} title="log out">
+      <li onClick={logout} className="views" title="log out">
         <FaDoorOpen />
       </li>
       <li>

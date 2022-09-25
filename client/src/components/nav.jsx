@@ -129,6 +129,7 @@ const Nav = ({
               className="search-term"
               placeholder="what are you watching?"
               value={search}
+              autoComplete="off"
               // Does work of setting the search state ('').
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {

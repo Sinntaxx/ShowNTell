@@ -224,7 +224,9 @@ game.post('/updates', (req, res) => {
             || (game.most_recent_update.title
               !== allPatchNotes[i].data.appnews.newsitems[0].title))
           ) {
-            game.most_recent_update = allPatchNotes[i].data.appnews.newsitems[0];
+            game.most_recent_update = game.most_recent_update ? game.most_recent_update : {};
+            game.most_recent_update.title = allPatchNotes[i].data.appnews.newsitems[0].title;
+            game.most_recent_update.url = allPatchNotes[i].data.appnews.newsitems[0].url;
             Games.findOneAndUpdate({ id: game.id }, game).catch((err) => console.error('khjbsdcisbvk', err));
             Promise.all(
               users

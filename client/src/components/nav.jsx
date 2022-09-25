@@ -123,7 +123,7 @@ const Nav = ({
       <li onClick={logout} className="views" title="log out">
         <FaDoorOpen />
       </li>
-      <li>
+      <li className="views">
         {' '}
         <div className="wrap">
           <div className="search">

@@ -3,6 +3,7 @@ import axios from 'axios';
 // child components
 import Achievements from './Achievements.jsx';
 import GameSelect from './GameSelect.jsx';
+import LeaderboardTable from './LeaderboardTable.jsx';
 
 const Leaderboards = ({ user }) => {
   // players subscribed games
@@ -10,6 +11,8 @@ const Leaderboards = ({ user }) => {
   const [selectInput, setSelectInput] = useState('');
   // get all players gameSubscriptions on render
   const [currGame, setCurrGame] = useState({});
+  // player info for leaderboards
+  const [players, setPlayers] = useState([]);
 
   useEffect(() => {
     axios.get(`/game/subscriptions/${user.id}`)
@@ -36,8 +39,15 @@ const Leaderboards = ({ user }) => {
 
   // make sure passGame is returning the right value
   useEffect(() => {
-    console.log('set to currGame\n', currGame);
-  }, [selectInput]);
+    axios.get('game/playerData')
+      .then(({ data }) => {
+        console.log('list of users, gameSubs, name, and achievements', data);
+        setPlayers(data);
+      })
+      .catch((err) => {
+        console.error('error on getting player data from db\n', err);
+      });
+  }, []);
 
   return (
     <div>
@@ -59,6 +69,7 @@ const Leaderboards = ({ user }) => {
         />
       )
         : null}
+      { players.length ? <LeaderboardTable players={players} currGame={currGame} /> : null }
     </div>
   );
 };

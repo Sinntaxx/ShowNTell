@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
 import ListSubheader from '@mui/material/ListSubheader';
 import axios from 'axios';
 
@@ -34,10 +33,17 @@ const Achievements = ({ user, gameList, currGame }) => {
         </ListSubheader>
       )}
     >
-      {currGame.achievements.map((achiev) => <AchievementEntry achievement={achiev} />)}
+      {currGame.achievements.map((achiev) => <AchievementEntry achievement={achiev} user={user} gameId={currGame.id} />)}
 
     </List>
   );
 };
 
 export default Achievements;
+
+// for later if I get the chance
+// renderOption={(props, option) => (
+//   <Box component="li" >
+//     {option}
+//   </Box>
+// )}

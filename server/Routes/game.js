@@ -159,11 +159,10 @@ game.post('/genre', (req, res) => {
 // url to notify webpage that a user has started a chat with the bot: https://${siteUrl}/game/newUser
 game.post('/newUser', (req, res) => {
   const { message } = req.body;
-  if (message.text.split(' ')[0] === '/start') {
+  if (message.text && message.text.split(' ')[0] === '/start') {
     // This is the user token to associate the user in the database with the user on telegram
     const userToken = message.text.split(' ')[1];
     const chatId = message.chat.id;
-    console.log('arrived');
     axios
       .post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         chat_id: chatId,
@@ -173,7 +172,6 @@ game.post('/newUser', (req, res) => {
         return Users.findOneAndUpdate({ id: userToken }, { chatId, notifs: true });
       })
       .then((result) => {
-        console.log(result);
         res.sendStatus(200);
       })
       .catch((err) => {
@@ -220,14 +218,15 @@ game.post('/updates', (req, res) => {
       })
       .then((games) => {
         games.forEach((game, i) => {
-          console.log(allPatchNotes[i].data.appnews.newsitems);
           if (
             allPatchNotes[i].data.appnews.newsitems.length
             && ((!game.most_recent_update)
             || (game.most_recent_update.title
               !== allPatchNotes[i].data.appnews.newsitems[0].title))
           ) {
-            game.most_recent_update = allPatchNotes[i].data.appnews.newsitems[0];
+            game.most_recent_update = game.most_recent_update ? game.most_recent_update : {};
+            game.most_recent_update.title = allPatchNotes[i].data.appnews.newsitems[0].title;
+            game.most_recent_update.url = allPatchNotes[i].data.appnews.newsitems[0].url;
             Games.findOneAndUpdate({ id: game.id }, game).catch((err) => console.error('khjbsdcisbvk', err));
             Promise.all(
               users

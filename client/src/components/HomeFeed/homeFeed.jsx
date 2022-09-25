@@ -14,7 +14,6 @@ const HomeFeed = ({ posts, handleUserClick, user, setPosts, setUser, getGames })
     };
     axios(config)
       .then((response) => {
-        console.log(response);
         getGames(response.data);
       })
       .catch((error) => {

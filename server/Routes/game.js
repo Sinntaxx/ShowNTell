@@ -11,6 +11,7 @@ const saveGame = async (game) => {
   // game is formatted from steam store api for db
   const dbGame = {
     id: game.steam_appid,
+    name: game.name,
     description: game.detailed_description,
     short_desc: game.short_description,
     about: game.about_the_game,

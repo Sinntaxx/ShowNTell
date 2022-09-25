@@ -31,18 +31,18 @@ const VideoGameEntry = ({ game, user, setUser }) => {
 
   useEffect(() => {
     const stringGameId = String(game.id);
-    console.log('user', user);
+    console.log('name of game→', game.name);
     if (user.gameSubscriptions.length && user.gameSubscriptions.includes(stringGameId)) {
       setIsSubscribed(true);
     }
   }, [isSubscribed]);
-
+  //
   const button = isSubscribed ? <button className="unsubscribe-button" onClick={handleUnsubscribeClick}>Unsubscribe</button> : <button className="subscribe-button" onClick={handleSubscibeClick}>Subscribe</button>;
+
   return (
     <div className="game-card">
       <div className="game-container">
         <h3 className="game-title"><b>{game.name}</b></h3>
-
         <p className="text">{game.short_desc}</p>
         <img className="video-game-image" src={game.header_image} alt="cover-art" />
         <p className="text">{game.price_overview}</p>

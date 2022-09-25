@@ -10,7 +10,9 @@ const VideoGameList = ({ user, setUser }) => {
   const [enteredVideoGame, setEnteredVideoGame] = useState('');
 
   const handleSubmissionClick = () => {
+    setVideoGameIsThere(false);
     console.log('we\'re in the handlesubmissionclick');
+
     axios.get(`/game/byname/${enteredVideoGame}`)
       .then(({ data }) => {
         console.log('data from db', data);

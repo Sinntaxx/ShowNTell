@@ -247,7 +247,7 @@ const App = () => {
 
     const config = {
       method: 'post',
-      url: 'http://localhost:8000/game/genre',
+      url: '/game/genre',
       headers: {
         'Content-Type': 'application/json',
       },

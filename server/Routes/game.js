@@ -11,6 +11,7 @@ const saveGame = async (game) => {
   // game is formatted from steam store api for db
   const dbGame = {
     id: game.steam_appid,
+    name: game.name,
     description: game.detailed_description,
     short_desc: game.short_description,
     about: game.about_the_game,
@@ -68,6 +69,21 @@ game.post('/newgame', (req, res) => {
     });
 });
 
+// get a single game by id
+game.get('/byId/:gameId', (req, res) => {
+  const { gameId } = req.params;
+  const id = Number(gameId);
+  Games.findOne({ id })
+    .then((game) => {
+      console.log('achievements\n', game);
+      res.status(200).send(game);
+    })
+    .catch((err) => {
+      console.error('error on finding game byId\n', err);
+      res.sendStatus(500);
+    });
+});
+
 // find games by name and save to db
 game.get('/byname/:name', (req, res) => {
   console.log('name from parameters', req.params);
@@ -117,6 +133,22 @@ game.get('/byname/:name', (req, res) => {
     });
 });
 
+// get all of users gameSubscriptions
+game.get('/subscriptions/:userId', (req, res) => {
+  const { userId } = req.params;
+  const id = Number(userId);
+
+  Users.findOne({ id })
+    .then(({ gameSubscriptions }) => {
+    // console.log('user gameSubs from db', gameSubscriptions);
+      res.status(200).send(gameSubscriptions);
+    })
+    .catch((err) => {
+      console.error('error on finding user\n', err);
+      res.sendStatus(500);
+    });
+});
+
 // path to get all achievements for a individual user;
 //  game.get('/user/achievements/:userId')
 
@@ -159,11 +191,10 @@ game.post('/genre', (req, res) => {
 // url to notify webpage that a user has started a chat with the bot: https://${siteUrl}/game/newUser
 game.post('/newUser', (req, res) => {
   const { message } = req.body;
-  if (message.text.split(' ')[0] === '/start') {
+  if (message.text && message.text.split(' ')[0] === '/start') {
     // This is the user token to associate the user in the database with the user on telegram
     const userToken = message.text.split(' ')[1];
     const chatId = message.chat.id;
-    console.log('arrived');
     axios
       .post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         chat_id: chatId,
@@ -173,7 +204,6 @@ game.post('/newUser', (req, res) => {
         return Users.findOneAndUpdate({ id: userToken }, { chatId, notifs: true });
       })
       .then((result) => {
-        console.log(result);
         res.sendStatus(200);
       })
       .catch((err) => {
@@ -220,14 +250,15 @@ game.post('/updates', (req, res) => {
       })
       .then((games) => {
         games.forEach((game, i) => {
-          console.log(allPatchNotes[i].data.appnews.newsitems);
           if (
             allPatchNotes[i].data.appnews.newsitems.length
             && ((!game.most_recent_update)
             || (game.most_recent_update.title
               !== allPatchNotes[i].data.appnews.newsitems[0].title))
           ) {
-            game.most_recent_update = allPatchNotes[i].data.appnews.newsitems[0];
+            game.most_recent_update = game.most_recent_update ? game.most_recent_update : {};
+            game.most_recent_update.title = allPatchNotes[i].data.appnews.newsitems[0].title;
+            game.most_recent_update.url = allPatchNotes[i].data.appnews.newsitems[0].url;
             Games.findOneAndUpdate({ id: game.id }, game).catch((err) => console.error('khjbsdcisbvk', err));
             Promise.all(
               users
@@ -295,12 +326,23 @@ game.put('/subscribe/:id', (req, res) => {
 // unsubscribe a videogame for a user by game id
 game.put('/unsubscribe', (req, res) => {
   console.log(req.body);
-  const { game, subscriptions } = req.body;
+  const { game, subscriptions, user } = req.body;
   const subscriptionLocation = subscriptions.indexOf(game.toString());
-  const newSubs = subscriptions;
-  newSubs.splice(subscriptionLocation, 1);
+  subscriptions.splice(subscriptionLocation, 1);
   console.log(subscriptions);
-  console.log('new', newSubs);
+  return Users.updateOne({ id: user }, { gameSubscriptions: subscriptions })
+    .then(() => {
+      console.log('we got to the findOne then catch');
+      return Users.findOne({ id: user });
+    })
+    .then((userObj) => {
+      console.log('userObj', userObj);
+      res.send(userObj).status(203);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(500);
+    });
 });
 
 game.get('/subscribed/:id', (req, res) => {

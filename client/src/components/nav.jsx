@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaHome, FaStar, FaPen, FaBell, FaEnvelope, FaSearch, FaDoorOpen, FaNewspaper, FaLinkedin, FaUnity, FaHandshake, FaFingerprint, FaSteamSymbol, FaFantasyFlightGames } from 'react-icons/fa';
+import { FaHome, FaStar, FaPen, FaBell, FaEnvelope, FaSearch, FaDoorOpen, FaNewspaper, FaLinkedin, FaUnity, FaHandshake, FaFingerprint, FaSteamSymbol, FaFantasyFlightGames, FaTrophy } from 'react-icons/fa';
 import logo from './HomePage/img/logo1.png';
 // import Notifications from './HomePage/Notifications.jsx';
 
@@ -108,19 +108,22 @@ const Nav = ({
       </li>
       <li
         onClick={() => onClick('recGames')}
-        className="Views"
+        className="views"
         title="recGames"
       >
         <FaSteamSymbol />
+      </li>
+      <li onClick={() => onClick('leaderboards')} className="views" title="leaderboards">
+        <FaTrophy />
       </li>
       <li onClick={() => onClick('friends')} className="views" title="friends">
         <FaHandshake />
         {' '}
       </li>
-      <li onClick={logout} title="log out">
+      <li onClick={logout} className="views" title="log out">
         <FaDoorOpen />
       </li>
-      <li>
+      <li className="views">
         {' '}
         <div className="wrap">
           <div className="search">
@@ -129,6 +132,7 @@ const Nav = ({
               className="search-term"
               placeholder="what are you watching?"
               value={search}
+              autoComplete="off"
               // Does work of setting the search state ('').
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {

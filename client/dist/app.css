@@ -11,7 +11,7 @@
   font-family: 'Poppins', sans-serif;
 }
 
-li {
+.views {
     display: inline;
     color:#5c637b;
     font-size: 28px;
@@ -20,7 +20,7 @@ li {
     width: 5%;
   }
 
-  li:hover {
+  .views:hover {
     color: #408ac8;
     height: 5%;
     width: 5%;

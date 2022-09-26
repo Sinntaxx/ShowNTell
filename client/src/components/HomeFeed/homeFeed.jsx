@@ -2,26 +2,20 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import FeedItem from './feedItem.jsx';
 import './homefeed.css';
-import Review from '../Review/Review.jsx';
 
 const HomeFeed = ({ posts, handleUserClick, user, setPosts, setUser, getGames }) => {
   useEffect(() => {
-    // HIGHLY LIKELY TO BE REMOVED
-    /// ////////////////////////////
     const config = {
       method: 'get',
-      url: 'http://localhost:8000/game/subscribe',
+      url: '/game/subscribe',
     };
     axios(config)
       .then((response) => {
-        console.log(response);
         getGames(response.data);
       })
       .catch((error) => {
         console.log(error);
       });
-
-    /// ///////////////////////
   }, []);
   return (
     <div>

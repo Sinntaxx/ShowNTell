@@ -25,6 +25,7 @@ import MovieFeed from './Subscriptions/MovieFeed.jsx';
 import FriendList from './FriendList/friendList.jsx';
 import VideoGameList from './VideoGameList/VideoGameList.jsx';
 import Games from './GameRecommended/Games.jsx';
+import Leaderboards from './GameLeaderboards/Leaderboards.jsx';
 import Review from './Review/Review.jsx';
 
 const App = () => {
@@ -91,7 +92,7 @@ const App = () => {
               });
             }
           });
-          setUsers(buildFollowers);
+          buildFollowers.length !== users.length ? setUsers(buildFollowers) : null;
         })
         .catch((err) => {
           console.error(err);
@@ -246,7 +247,7 @@ const App = () => {
 
     const config = {
       method: 'post',
-      url: 'http://localhost:8000/game/genre',
+      url: '/game/genre',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -341,11 +342,14 @@ const App = () => {
       );
     }
     if (view === 'videoGames') {
-      return <VideoGameList viewSwitcher={viewSwitcher} user={user} />;
+      return <VideoGameList viewSwitcher={viewSwitcher} user={user} setUser={setUser} />;
     }
     // Should show the games view
     if (view === 'recGames') {
       return <Games recGames={recommendedGames} />;
+    }
+    if (view === 'leaderboards') {
+      return <Leaderboards user={user} />;
     }
   };
 

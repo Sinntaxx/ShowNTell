@@ -15,19 +15,23 @@ const Achievements = ({ user, gameList, currGame }) => {
   }, []);
   return (
     <List
+      scrollbarColor
+      style={{ borderRadius: '10px' }}
       sx={{
-        width: '100%',
-        maxWidth: 360,
         maxHeight: 360,
         overflow: 'scroll',
-        scrollbarColor: '#5c637b',
+        scrollbarColor: 'green',
         bgcolor: '#212121',
+        borderRadius: '10px',
       }}
       subheader={(
-        <ListSubheader sx={{
-          color: '#5c637b',
-          bgcolor: '#212121',
-        }}
+        <ListSubheader
+          style={{ justifyContent: 'center' }}
+          sx={{
+            color: '#909497',
+            bgcolor: '#212121',
+            justifyItems: 'center',
+          }}
         >
           Achievements
         </ListSubheader>

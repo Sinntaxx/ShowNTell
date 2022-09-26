@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Grid } from '@mui/material';
+
 // child components
 import Achievements from './Achievements.jsx';
 import GameSelect from './GameSelect.jsx';
@@ -50,27 +52,33 @@ const Leaderboards = ({ user }) => {
   }, []);
 
   return (
-    <div>
-      {gameList.length ? (
-        <GameSelect
-          gameList={gameList}
-          selectInput={selectInput}
-          setSelectInput={setSelectInput}
-          setCurrGame={setCurrGame}
-        />
-      )
-        : null}
-      {selectInput.length ? (
-        <Achievements
-          user={user}
-          gameList={gameList}
-          currGame={currGame}
-          selectInput={selectInput}
-        />
-      )
-        : null}
-      { players.length ? <LeaderboardTable players={players} currGame={currGame} /> : null }
-    </div>
+    <Grid container xs={12} justifyContent="space-evenly" spacing={2} sx={{}}>
+      <Grid item xs={4} sx={{}}>
+        {gameList.length ? (
+          <GameSelect
+            gameList={gameList}
+            selectInput={selectInput}
+            setSelectInput={setSelectInput}
+            setCurrGame={setCurrGame}
+          />
+        )
+          : null}
+        {selectInput.length ? (
+          <Achievements
+            user={user}
+            gameList={gameList}
+            currGame={currGame}
+            selectInput={selectInput}
+          />
+        )
+          : null}
+
+      </Grid>
+      <Grid item xs={6} sx={{}}>
+        { players.length ? <LeaderboardTable players={players} currGame={currGame} /> : null }
+      </Grid>
+    </Grid>
+
   );
 };
 

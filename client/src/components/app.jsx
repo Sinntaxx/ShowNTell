@@ -364,6 +364,7 @@ const App = () => {
           setSearch={setSearch}
           onSearch={searchShows}
           onSearchTwo={searchMovies}
+          view={view}
         />
       ) : (
         <a

@@ -55,6 +55,63 @@ const saveGame = async (game) => {
   }
 };
 
+// get all users for leaderboards
+game.get('/playerData', (req, res) => {
+  Users.find()
+    .then((users) => {
+      const userLeaderboards = users.map((user) => {
+        return {
+          name: user.name,
+          gameSubscriptions: user.gameSubscriptions,
+          achievements: user.achievements,
+        };
+      });
+
+      res.status(200).send(userLeaderboards);
+    })
+    .catch((err) => {
+      console.error('error on getting users\n', err);
+      res.sendStatus(500);
+    });
+});
+
+game.get('/player/:playerId', (req, res) => {
+  const { playerId } = req.params;
+  const id = Number(playerId);
+  Users.findOne({ id })
+    .then((player) => {
+      console.log('here is player', player);
+      res.status(200).send(player);
+    })
+    .catch((err) => {
+      console.error('error on \n', err);
+      res.sendStatus(500);
+    });
+});
+
+game.put('/getAchievement', (req, res) => {
+  const { achievement, id, gameId } = req.body;
+
+  Users.findOne({ id })
+    .then((user) => {
+      const achiev = {
+        gameId,
+        achievement: achievement.name,
+      };
+      const userAch = user.achievements;
+      userAch.push(achiev);
+      return Users.findOneAndUpdate({ id: user.id }, { achievements: userAch }, { returnDocument: 'after' });
+    })
+    .then((data) => {
+      console.log('updated achievements', data);
+      res.sendStatus(201);
+    })
+    .catch((err) => {
+      console.error('error on \n', err);
+      res.sendStatus(500);
+    });
+});
+
 // testing saveGame with request, remove later
 game.post('/newgame', (req, res) => {
   const newGame = req.body;
@@ -140,7 +197,7 @@ game.get('/subscriptions/:userId', (req, res) => {
 
   Users.findOne({ id })
     .then(({ gameSubscriptions }) => {
-    // console.log('user gameSubs from db', gameSubscriptions);
+      // console.log('user gameSubs from db', gameSubscriptions);
       res.status(200).send(gameSubscriptions);
     })
     .catch((err) => {
@@ -189,6 +246,8 @@ game.post('/genre', (req, res) => {
 });
 
 // url to notify webpage that a user has started a chat with the bot: https://${siteUrl}/game/newUser
+// url to have user click: https://telegram.me/GameAndWatchBot?start=${userId}
+// Endpoint for welcoming a new user and updating their status in the database
 game.post('/newUser', (req, res) => {
   const { message } = req.body;
   if (message.text && message.text.split(' ')[0] === '/start') {
@@ -203,7 +262,7 @@ game.post('/newUser', (req, res) => {
       .then(() => {
         return Users.findOneAndUpdate({ id: userToken }, { chatId, notifs: true });
       })
-      .then((result) => {
+      .then(() => {
         res.sendStatus(200);
       })
       .catch((err) => {
@@ -215,10 +274,8 @@ game.post('/newUser', (req, res) => {
   }
 });
 
-// url to have user click: https://telegram.me/GameAndWatchBot?start=${userId}
-
 // Url for getting news about a game by its id:  http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${game.id}&count=5&format=json
-// Endpoint for finding out if any games have been updated and notifying subscribed users
+// Endpoint for finding out if any games have been updated and notifying subscribed users through Telegram
 game.post('/updates', (req, res) => {
   let allPatchNotes;
   Users.find({ notifs: true }).then((users) => {
@@ -253,8 +310,8 @@ game.post('/updates', (req, res) => {
           if (
             allPatchNotes[i].data.appnews.newsitems.length
             && ((!game.most_recent_update)
-            || (game.most_recent_update.title
-              !== allPatchNotes[i].data.appnews.newsitems[0].title))
+              || (game.most_recent_update.title
+                !== allPatchNotes[i].data.appnews.newsitems[0].title))
           ) {
             game.most_recent_update = game.most_recent_update ? game.most_recent_update : {};
             game.most_recent_update.title = allPatchNotes[i].data.appnews.newsitems[0].title;

@@ -145,7 +145,7 @@ const Review = ({ user, createPost }) => {
             placeholder="title"
           />
         </div>
-        <div className="img-content-container">
+        {/* <div className="img-content-container">
           Post a meme!
           <input
             type="file"
@@ -161,7 +161,7 @@ const Review = ({ user, createPost }) => {
           >
             <img id="post-img" ref={uploadedImg} alt="" />
           </div>
-        </div>
+        </div> */}
         <div className="content-container">
           <textarea
             id="post-text"

@@ -10,7 +10,7 @@ mongoose
   // eslint-disable-next-line no-console
   .then(() => {
     axios
-      .post('https://b291-99-121-10-200.ngrok.io/game/updates')
+      .post('https://3e55-99-121-10-200.ngrok.io/game/updates')
       .then(() => {
         console.log('Notifications Sent');
       })
@@ -19,7 +19,7 @@ mongoose
       });
     setInterval(() => {
       axios
-        .post('https://b291-99-121-10-200.ngrok.io/game/updates')
+        .post('https://3e55-99-121-10-200.ngrok.io/game/updates')
         .then(() => {
           console.log('Notifications Sent');
         })

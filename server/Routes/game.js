@@ -189,6 +189,7 @@ game.post('/genre', (req, res) => {
 });
 
 // url to notify webpage that a user has started a chat with the bot: https://${siteUrl}/game/newUser
+// url to have user click: https://telegram.me/GameAndWatchBot?start=${userId}
 // Endpoint for welcoming a new user and updating their status in the database
 game.post('/newUser', (req, res) => {
   const { message } = req.body;
@@ -216,10 +217,8 @@ game.post('/newUser', (req, res) => {
   }
 });
 
-// url to have user click: https://telegram.me/GameAndWatchBot?start=${userId}
-
 // Url for getting news about a game by its id:  http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${game.id}&count=5&format=json
-// Endpoint for finding out if any games have been updated and notifying subscribed users
+// Endpoint for finding out if any games have been updated and notifying subscribed users through Telegram
 game.post('/updates', (req, res) => {
   let allPatchNotes;
   Users.find({ notifs: true }).then((users) => {

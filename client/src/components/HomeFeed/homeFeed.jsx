@@ -5,17 +5,17 @@ import './homefeed.css';
 
 const HomeFeed = ({ posts, handleUserClick, user, setPosts, setUser, getGames }) => {
   useEffect(() => {
-    const config = {
-      method: 'get',
-      url: '/game/subscribe',
-    };
-    axios(config)
-      .then((response) => {
-        getGames(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    // const config = {
+    //   method: 'get',
+    //   url: '/game/subscribe',
+    // };
+    // axios(config)
+    //   .then((response) => {
+    //     getGames(response.data);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   }, []);
   return (
     <div>

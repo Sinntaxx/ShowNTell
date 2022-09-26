@@ -11,6 +11,7 @@ const Nav = ({
   setSearch,
   onSearch,
   onSearchTwo,
+  view,
 }) => (
   <div>
     <link
@@ -80,15 +81,17 @@ const Nav = ({
         <FaNewspaper />
         {' '}
       </li>
-      <li
-        onClick={() => onClick('notifs')}
-        className="views"
-        title="general notifications"
-      >
-        <FaBell />
-        {' '}
-      </li>
-      {!user.notifs ? (
+      {view !== 'videoGames' ? (
+        <li
+          onClick={() => onClick('notifs')}
+          className="views"
+          title="general notifications"
+        >
+          <FaBell />
+          {' '}
+        </li>
+      ) : null}
+      {!user.notifs && view === 'videoGames' ? (
         <li
           onClick={() => onClick('gameNotifs')}
           className="views"

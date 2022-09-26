@@ -479,7 +479,6 @@ app.post('/upload', async (req, res) => {
 });
 
 app.post('/posts', (req, res) => {
-  console.log(req.body, 'texttttttttt');
   const { title, content, poster, topic_id, name, type } = req.body;
   const { text, pic } = content;
   Users.findOne({ id: req.cookies.ShowNTellId }).then((data) => {
@@ -769,10 +768,8 @@ app.put('/unfollow', (req, res) => {
 
 // test changes in users props
 app.get('/users/:id/', (req, res) => {
-  console.log('hi');
   Users.findOne({ id: req.params.id })
     .then((data) => {
-      console.log('hi');
       res.json(data);
     })
     .catch((err) => {

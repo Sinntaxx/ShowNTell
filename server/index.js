@@ -94,7 +94,7 @@ app.get(
         res.redirect('/');
         userInfo = data;
       } else {
-        newUser.notifs = false;
+        newUser.game_notifs = false;
         newUser.save().then(() => {
           userInfo = newUser;
           res.redirect('/');

@@ -91,7 +91,7 @@ const Nav = ({
           {' '}
         </li>
       ) : null}
-      {!user.notifs && view === 'videoGames' ? (
+      {!user.game_notifs && view === 'videoGames' ? (
         <li
           onClick={() => onClick('gameNotifs')}
           className="views"
@@ -125,6 +125,7 @@ const Nav = ({
       </li>
       <li onClick={logout} className="views" title="log out">
         <FaDoorOpen />
+        {' '}
       </li>
       <li className="views">
         {' '}

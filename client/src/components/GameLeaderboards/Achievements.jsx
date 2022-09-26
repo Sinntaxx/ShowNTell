@@ -1,43 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
 import ListSubheader from '@mui/material/ListSubheader';
 import axios from 'axios';
 
 import AchievementEntry from './AchievementEntry.jsx';
 
-const Achievements = ({ user, gameList, currGame }) => {
-  // select game to display achievements for
-  const [game, setGame] = useState({});
-
+const Achievements = ({ currGame, setPlayers, setUpdateCount, updateCount, player1 }) => {
   // testing currGame
   useEffect(() => {
-    console.log('currGame', currGame);
-  }, []);
+  }, [updateCount, currGame]);
   return (
     <List
+      scrollbarColor
+      style={{ borderRadius: '10px' }}
       sx={{
-        width: '100%',
-        maxWidth: 360,
         maxHeight: 360,
         overflow: 'scroll',
-        scrollbarColor: '#5c637b',
         bgcolor: '#212121',
+        borderRadius: '10px',
       }}
       subheader={(
-        <ListSubheader sx={{
-          color: '#5c637b',
-          bgcolor: '#212121',
-        }}
+        <ListSubheader
+          style={{ justifyContent: 'center' }}
+          sx={{
+            color: '#909497',
+            bgcolor: '#212121',
+            justifyItems: 'center',
+          }}
         >
           Achievements
         </ListSubheader>
       )}
     >
-      {currGame.achievements.map((achiev) => <AchievementEntry achievement={achiev} />)}
+      {currGame.achievements.map((achiev) => (
+        <AchievementEntry
+          achievement={achiev}
+          gameId={currGame.id}
+          setPlayers={setPlayers}
+          updateCount={updateCount}
+          setUpdateCount={setUpdateCount}
+          player1={player1}
+        />
+      ))}
 
     </List>
   );
 };
 
 export default Achievements;
+
+// for later if I get the chance
+// renderOption={(props, option) => (
+//   <Box component="li" >
+//     {option}
+//   </Box>
+// )}

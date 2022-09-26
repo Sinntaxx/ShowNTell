@@ -40,5 +40,6 @@ module.exports = {
     'no-nested-ternary': 0,
     'react/no-unknown-property': 0,
     'no-unused-expressions': 0,
+    'array-callback-return': 0,
   },
 };

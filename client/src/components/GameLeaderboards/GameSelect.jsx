@@ -32,13 +32,19 @@ const GameSelect = ({ gameList, selectInput, setSelectInput, setCurrGame }) => {
       autoHighlight
       autoSelect
       clearOnEscape
+      style={{ borderRadius: '5px' }}
+      sx={{ bgcolor: '#212121', color: '#909497' }}
       onInputChange={(e, val) => { handleSelectChange(e, val); }}
       getOptionLabel={(name) => (name)}
       renderInput={(params) => (
         <TextField
           {...params}
+          variant="filled"
           label="Pick your poison"
+          InputLabelProps={{ style: { color: '#909497' } }}
           autoComplete="game"
+          bgcolor="white"
+          sx={{ input: { color: '#909497' }, bgcolor: '#212121', borderRadius: '10px' }}
         />
       )}
     />

@@ -75,6 +75,20 @@ game.get('/playerData', (req, res) => {
     });
 });
 
+game.get('/player/:playerId', (req, res) => {
+  const { playerId } = req.params;
+  const id = Number(playerId);
+  Users.findOne({ id })
+    .then((player) => {
+      console.log('here is player', player);
+      res.status(200).send(player);
+    })
+    .catch((err) => {
+      console.error('error on \n', err);
+      res.sendStatus(500);
+    });
+});
+
 game.put('/getAchievement', (req, res) => {
   const { achievement, id, gameId } = req.body;
 

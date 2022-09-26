@@ -7,25 +7,44 @@ import Button from '@mui/material/Button';
 import { FaCheckCircle } from 'react-icons/fa';
 import axios from 'axios';
 
-const AchievementEntry = ({ achievement, user, gameId }) => {
+const AchievementEntry = ({ achievement, gameId, setPlayers, setUpdateCount, updateCount, player1 }) => {
+  const [gotAchievement, setGotAchievement] = useState(false);
+
   const achievementGet = () => {
+    const found = player1.achievements.find((ach) => {
+      if (ach.gameId === gameId && ach.achievement === achievement.name) {
+        return ach;
+      }
+
+      return undefined;
+    });
+    if (found) {
+      window.alert('you already have this achievement');
+    }
     axios.put('/game/getAchievement', {
       achievement,
-      id: user.id,
+      id: player1.id,
       gameId,
     })
-      .then((data) => {
-        console.log('', data);
+      .then(({ data }) => {
+        console.log('got the achievement', data);
+        return axios.get('/game/playerData');
       })
       .catch((err) => {
-      // console.error('error on \n', err);
+        console.error('error on getting achievement\n', err);
+      })
+      .then(({ data }) => {
+        console.log('\n\n\n\nupdate player data', data);
+        setPlayers(data);
+        setUpdateCount(updateCount + 1);
+      })
+      .catch((err) => {
+        console.log('error getting playerData', err);
       });
   };
 
   // update players current achievements
-  // useEffect(() => {
 
-  // })
   return (
     <ListItem
       alignItems="center"

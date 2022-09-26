@@ -5,14 +5,10 @@ import axios from 'axios';
 
 import AchievementEntry from './AchievementEntry.jsx';
 
-const Achievements = ({ user, gameList, currGame }) => {
-  // select game to display achievements for
-  const [game, setGame] = useState({});
-
+const Achievements = ({ currGame, setPlayers, setUpdateCount, updateCount, player1 }) => {
   // testing currGame
   useEffect(() => {
-    console.log('currGame', currGame);
-  }, []);
+  }, [updateCount, currGame]);
   return (
     <List
       scrollbarColor
@@ -20,7 +16,6 @@ const Achievements = ({ user, gameList, currGame }) => {
       sx={{
         maxHeight: 360,
         overflow: 'scroll',
-        scrollbarColor: 'green',
         bgcolor: '#212121',
         borderRadius: '10px',
       }}
@@ -37,7 +32,16 @@ const Achievements = ({ user, gameList, currGame }) => {
         </ListSubheader>
       )}
     >
-      {currGame.achievements.map((achiev) => <AchievementEntry achievement={achiev} user={user} gameId={currGame.id} />)}
+      {currGame.achievements.map((achiev) => (
+        <AchievementEntry
+          achievement={achiev}
+          gameId={currGame.id}
+          setPlayers={setPlayers}
+          updateCount={updateCount}
+          setUpdateCount={setUpdateCount}
+          player1={player1}
+        />
+      ))}
 
     </List>
   );

@@ -15,6 +15,8 @@ const Leaderboards = ({ user }) => {
   const [currGame, setCurrGame] = useState({});
   // player info for leaderboards
   const [players, setPlayers] = useState([]);
+  const [updateCount, setUpdateCount] = useState(0);
+  const [player1, setPlayer1] = useState({});
 
   useEffect(() => {
     axios.get(`/game/subscriptions/${user.id}`)
@@ -41,15 +43,33 @@ const Leaderboards = ({ user }) => {
 
   // make sure passGame is returning the right value
   useEffect(() => {
-    axios.get('game/playerData')
+    axios.get('/game/playerData')
       .then(({ data }) => {
         console.log('list of users, gameSubs, name, and achievements', data);
+
+        const order = data.sort((a, b) => {
+          if (a.achievements.length < b.achievements.length) {
+            return 1;
+          }
+          return -1;
+        });
+        console.log('sorting players by score', order);
         setPlayers(data);
       })
       .catch((err) => {
         console.error('error on getting player data from db\n', err);
       });
-  }, []);
+  }, [updateCount]);
+
+  useEffect(() => {
+    axios.get(`/game/player/${user.id}`)
+      .then(({ data }) => {
+        setPlayer1(data);
+      })
+      .catch((err) => {
+        console.error('error on updating player\n', err);
+      });
+  }, [currGame, updateCount]);
 
   return (
     <Grid container xs={12} justifyContent="space-evenly" spacing={2} sx={{}}>
@@ -69,13 +89,18 @@ const Leaderboards = ({ user }) => {
             gameList={gameList}
             currGame={currGame}
             selectInput={selectInput}
+            updateCount={updateCount}
+            setUpdateCount={setUpdateCount}
+            setPlayers={setPlayers}
+            players={players}
+            player1={player1}
           />
         )
           : null}
 
       </Grid>
       <Grid item xs={6} sx={{}}>
-        { players.length ? <LeaderboardTable players={players} currGame={currGame} /> : null }
+        {players.length ? <LeaderboardTable players={players} currGame={currGame} /> : null}
       </Grid>
     </Grid>
 

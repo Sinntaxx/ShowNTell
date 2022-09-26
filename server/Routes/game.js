@@ -11,6 +11,7 @@ const saveGame = async (game) => {
   // game is formatted from steam store api for db
   const dbGame = {
     id: game.steam_appid,
+    name: game.name,
     description: game.detailed_description,
     short_desc: game.short_description,
     about: game.about_the_game,
@@ -68,6 +69,21 @@ game.post('/newgame', (req, res) => {
     });
 });
 
+// get a single game by id
+game.get('/byId/:gameId', (req, res) => {
+  const { gameId } = req.params;
+  const id = Number(gameId);
+  Games.findOne({ id })
+    .then((game) => {
+      console.log('achievements\n', game);
+      res.status(200).send(game);
+    })
+    .catch((err) => {
+      console.error('error on finding game byId\n', err);
+      res.sendStatus(500);
+    });
+});
+
 // find games by name and save to db
 game.get('/byname/:name', (req, res) => {
   console.log('name from parameters', req.params);
@@ -113,6 +129,22 @@ game.get('/byname/:name', (req, res) => {
     })
     .catch((err) => {
       console.error('error requesting app id by name\n', err);
+      res.sendStatus(500);
+    });
+});
+
+// get all of users gameSubscriptions
+game.get('/subscriptions/:userId', (req, res) => {
+  const { userId } = req.params;
+  const id = Number(userId);
+
+  Users.findOne({ id })
+    .then(({ gameSubscriptions }) => {
+    // console.log('user gameSubs from db', gameSubscriptions);
+      res.status(200).send(gameSubscriptions);
+    })
+    .catch((err) => {
+      console.error('error on finding user\n', err);
       res.sendStatus(500);
     });
 });
@@ -295,12 +327,23 @@ game.put('/subscribe/:id', (req, res) => {
 // unsubscribe a videogame for a user by game id
 game.put('/unsubscribe', (req, res) => {
   console.log(req.body);
-  const { game, subscriptions } = req.body;
+  const { game, subscriptions, user } = req.body;
   const subscriptionLocation = subscriptions.indexOf(game.toString());
-  const newSubs = subscriptions;
-  newSubs.splice(subscriptionLocation, 1);
+  subscriptions.splice(subscriptionLocation, 1);
   console.log(subscriptions);
-  console.log('new', newSubs);
+  return Users.updateOne({ id: user }, { gameSubscriptions: subscriptions })
+    .then(() => {
+      console.log('we got to the findOne then catch');
+      return Users.findOne({ id: user });
+    })
+    .then((userObj) => {
+      console.log('userObj', userObj);
+      res.send(userObj).status(203);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(500);
+    });
 });
 
 game.get('/subscribed/:id', (req, res) => {

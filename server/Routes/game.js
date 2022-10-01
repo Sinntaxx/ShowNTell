@@ -260,7 +260,7 @@ game.post('/newUser', (req, res) => {
         text: 'You are now subscribed to notifications from Game&Watch',
       })
       .then(() => {
-        return Users.findOneAndUpdate({ id: userToken }, { chatId, notifs: true });
+        return Users.findOneAndUpdate({ id: userToken }, { chatId, game_notifs: true });
       })
       .then(() => {
         res.sendStatus(200);
@@ -278,7 +278,7 @@ game.post('/newUser', (req, res) => {
 // Endpoint for finding out if any games have been updated and notifying subscribed users through Telegram
 game.post('/updates', (req, res) => {
   let allPatchNotes;
-  Users.find({ notifs: true }).then((users) => {
+  Users.find({ game_notifs: true }).then((users) => {
     Games.find({})
       .then((games) => {
         return Promise.all(

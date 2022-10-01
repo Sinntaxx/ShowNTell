@@ -41,7 +41,7 @@ This section will discuss what is needed to get the project up and running on yo
 
 ### What to Add to Your .env
 
-1. Steam archive key go to [Steam Api]()
+1. Steam archive key go to [Steam Api]() 
 2. In the Google Developers Console, generate a CLIENT ID and CLIENT SECRET.
 3. Visit [MongoDBs Cloud Atlas](https://www.mongodb.com/cloud/atlas), create a free account, and auto-generate a secure password.
 4. Go to [Cloudinary](https://cloudinary.com/), create a free account and configure your API KEY, SECRET, and CLOUD NAME

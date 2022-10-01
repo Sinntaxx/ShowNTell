@@ -4,9 +4,9 @@
 
 ## Project Overview
 
-Tired of finishing an AMAZING tv show and having no one to talk about it with because your friends haven't watched it yet? Show & Tell is a global community of TV fans, a place where you can create a personalized feed of your favorite content, show some love for your favorite shows, posts, and fellow users with a "like", and write and share reviews. Inspired by Reddit and the desire to have conversations about our favorite shows.
+Tired of finishing an AMAZING game or tv show and having no one to talk to about it? Show & Tell is a global community of Game/TV fans. Here you can create a personalized feed of your favorite content, show some love for your favorite games/shows, post, and follow user
+with a like! Inspired by reddit.
 
-Visit the live site: [Show & Tell](http://showntell.uc.r.appspot.com/)
 
 ## How to Interact w/ Show & Tell
 
@@ -28,10 +28,12 @@ Visit the live site: [Show & Tell](http://showntell.uc.r.appspot.com/)
 
 ## APIs
 
-1. Twilio ( 3.52.0 - [Twilio API Docs](https://www.twilio.com/docs/api) )
+1. Telegram ([Twilio API Docs](https://core.telegram.org/#getting-started) )
 2. TV Maze ([TV Maze API Docs](https://www.tvmaze.com/api))
 3. Youtube ([Youtube API Docs](https://developers.google.com/youtube/v3))
 4. Cloudinary ([Cloudinary Docs](https://cloudinary.com/documentation/image_video_and_file_upload))
+5. Steam API ([Steam API DOCS]('''''''''))
+6. Steamspy API ([Steamspy API Docs](https://steamspy.com/api.php))
 
 ## Project Setup
 
@@ -39,7 +41,7 @@ This section will discuss what is needed to get the project up and running on yo
 
 ### What to Add to Your .env
 
-1. Head over to [Twilio](https://www.twilio.com/console), set up a free account, and you will be provided with two important things, an ACCOUNT SID and an AUTH TOKEN. **_Twilio's free account will require users to go through verification._**
+1. Steam archive key go to [Steam Api]()
 2. In the Google Developers Console, generate a CLIENT ID and CLIENT SECRET.
 3. Visit [MongoDBs Cloud Atlas](https://www.mongodb.com/cloud/atlas), create a free account, and auto-generate a secure password.
 4. Go to [Cloudinary](https://cloudinary.com/), create a free account and configure your API KEY, SECRET, and CLOUD NAME

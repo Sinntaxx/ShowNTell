@@ -7,7 +7,7 @@ const HomeFeed = ({ posts, handleUserClick, user, setPosts, setUser, getGames })
   useEffect(() => {
     const config = {
       method: 'get',
-      url: '/game/subscribe',
+      url: 'http://localhost:8000/game/subscribe',
     };
     axios(config)
       .then((response) => {
